@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<dwsync>
+<file name="order_confirmation_user_ftp.tpl.html" server="ftp.pcextreme.nl//domains/weclip.nl/htdocs/www/" local="130800060000000000" remote="130800060000000000" Dst="1" />
+<file name="order_confirmation_admin.tpl.html" server="ftp.pcextreme.nl//domains/weclip.nl/htdocs/www/" local="130800060000000000" remote="130800060000000000" Dst="1" />
+<file name="order_confirmation_user_upload.tpl.html" server="ftp.pcextreme.nl//domains/weclip.nl/htdocs/www/" local="130800024000000000" remote="130800024000000000" Dst="2" />
+<file name="footer.tpl.html" server="ftp.pcextreme.nl//domains/weclip.nl/htdocs/www/" local="130800060000000000" remote="130800060000000000" Dst="1" />
+<file name="header.tpl.html" server="ftp.pcextreme.nl//domains/weclip.nl/htdocs/www/" local="130800060000000000" remote="130800060000000000" Dst="1" />
+<file name="order_status_change.tpl.html" server="ftp.pcextreme.nl//domains/weclip.nl/htdocs/www/" local="130800060000000000" remote="130800060000000000" Dst="1" />
+<file name="user_registration.tpl.html" server="ftp.pcextreme.nl//domains/weclip.nl/htdocs/www/" local="130800060000000000" remote="130800060000000000" Dst="1" />
+<file name="user_registration_admin.tpl.html" server="ftp.pcextreme.nl//domains/weclip.nl/htdocs/www/" local="130800060000000000" remote="130800060000000000" Dst="1" />
+<file name="footer.tpl.html" server="ftp.pcextreme.nl//domains/weclip.nl/htdocs/www/dev/" local="130800060000000000" remote="131073666600000000" Dst="2" />
+<file name="order_confirmation_admin.tpl.html" server="ftp.pcextreme.nl//domains/weclip.nl/htdocs/www/dev/" local="130800060000000000" remote="131073666600000000" Dst="2" />
+<file name="header.tpl.html" server="ftp.pcextreme.nl//domains/weclip.nl/htdocs/www/dev/" local="130800060000000000" remote="131073666600000000" Dst="2" />
+<file name="order_confirmation_user_ftp.tpl.html" server="ftp.pcextreme.nl//domains/weclip.nl/htdocs/www/dev/" local="130800060000000000" remote="131073666600000000" Dst="2" />
+<file name="order_confirmation_user_upload.tpl.html" server="ftp.pcextreme.nl//domains/weclip.nl/htdocs/www/dev/" local="130800024000000000" remote="131073666600000000" Dst="2" />
+<file name="order_status_change.tpl.html" server="ftp.pcextreme.nl//domains/weclip.nl/htdocs/www/dev/" local="130800060000000000" remote="131073666600000000" Dst="2" />
+<file name="user_registration.tpl.html" server="ftp.pcextreme.nl//domains/weclip.nl/htdocs/www/dev/" local="130800060000000000" remote="131073666600000000" Dst="2" />
+<file name="user_registration_admin.tpl.html" server="ftp.pcextreme.nl//domains/weclip.nl/htdocs/www/dev/" local="130800060000000000" remote="131073666600000000" Dst="2" />
+</dwsync>
