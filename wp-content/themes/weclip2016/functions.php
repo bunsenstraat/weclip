@@ -117,6 +117,13 @@ function modify_contact_methods($profile_fields) {
 }
 add_filter('user_contactmethods', 'modify_contact_methods');
 
+/////ACF Options page toevoegen
+
+if( function_exists('acf_add_options_page') ) {
+	
+	acf_add_options_page();
+	
+}
 
 /* Voeg even en oneven classes toe aan de posts
 function oddeven_post_class ( $classes ) {
@@ -131,6 +138,7 @@ add_filter ( 'post_class' , 'oddeven_post_class' );
 global $current_class;
 $current_class = 'odd';
 */
+
 
 
 

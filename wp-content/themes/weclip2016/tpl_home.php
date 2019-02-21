@@ -3,6 +3,23 @@
 Template Name: Homepage 
 */
 get_header();
+
+		$args = array (
+            'taxonomy' => 'category', //empty string(''), false, 0 don't work, and return empty array
+            'orderby' => 'name',
+            'order' => 'ASC',
+            'hide_empty' => FALSE,
+            'include' => array(2,3,4)
+    );
+		$i = 0;
+		$categories = get_categories($args);
+		
+
+
+		//print_r($args);
+		//print_r($categories);
+		//exit();
+
 ?>
     <header id="header" class="header patOrHor" role="banner" itemscope="itemscope" itemtype="http://schema.org/Organization">
 
@@ -42,18 +59,7 @@ get_header();
 	<section id="categories" class="section">
 		<div class="row">
         <?php
-		$args = array (
-            'taxonomy' => 'category', //empty string(''), false, 0 don't work, and return empty array
-            'orderby' => 'name',
-            'order' => 'ASC',
-            'exclude' => array(1,5)
-    );
-		$i = 0;
-		$categories = get_categories($args);
-		
-		
-		print_r($categories);
-		exit();
+
 		
 		if($categories){
 			
@@ -69,9 +75,9 @@ get_header();
 						
 				?>
             	<div class="part" id="new<?php echo $i; ?>">
-						<div class="cat_img"><img src="<?php echo $cat_image1['url']; echo $cat_image; ?>"></div>
+						<div class="cat_img"><img src="<?php echo $cat_image['url'];?>"></div>
 						<div class="cat_tit"><h2><?php echo $cat_name; ?></h2></div>
-						<div class="cat_price"><span class="c_f">Vanaf</span><span class="c_t"><?php echo '€'.$cat_price. 'id'.$term; ?></span></div>
+						<div class="cat_price"><span class="c_f">Vanaf</span><span class="c_t"><?php echo '€'.$cat_price; ?></span></div>
 						<a class="bestelButton patBlHor" href="<?php echo get_template_directory_uri();?>/order-action.php/?single_cat=<?php echo $cat_name;?>">BESTEL HIER</a>
 					</div>
 				</div>
@@ -83,6 +89,7 @@ get_header();
 		
         
         
+<!--
 		<?php
 			$i = 0;
 			$category_ids = array(2,4,3);
@@ -105,6 +112,7 @@ get_header();
 					</div>
 				</div>
 		<?php $i++;	} ?>
+-->
 
         </div>
     </section>
