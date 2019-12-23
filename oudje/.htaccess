@@ -1,0 +1,23 @@
+RewriteEngine On
+RewriteCond %{HTTP_HOST} ^weclip.nl$ [NC]
+
+# DOCUMENT ROOT PROBLEM ON NEW HOST
+# by jan@whseo.nl - 08-01-2014
+php_value auto_prepend_file "/home/vhosting/y/vhost0062999/domains/weclip.nl/htdocs/www/_documentroot.php" 
+
+RewriteRule ^order http://www.weclip.nl/bestellen?pg1=1 [R=301,L]
+RewriteRule ^40224/author/noframe$ - [F]
+
+# BEGIN WordPress
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+
+# END WordPress
+
+php_value upload_max_filesize 128M

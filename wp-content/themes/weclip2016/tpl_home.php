@@ -9,7 +9,8 @@ get_header();
             'orderby' => 'name',
             'order' => 'ASC',
             'hide_empty' => FALSE,
-            'include' => array(2,3,4)
+            'include' => array(2,3,4),
+			'orderby' => 'term_id'
     );
 		$i = 0;
 		$categories = get_categories($args);
@@ -56,7 +57,7 @@ get_header();
               
 
     </header>
-	<section id="categories" class="section">
+	<section id="categories" class="section catOrder blueblock">
 		<div class="row">
         <?php
 
@@ -74,12 +75,11 @@ get_header();
 			
 						
 				?>
-            	<div class="part" id="new<?php echo $i; ?>">
-						<div class="cat_img"><img src="<?php echo $cat_image['url'];?>"></div>
-						<div class="cat_tit"><h2><?php echo $cat_name; ?></h2></div>
-						<div class="cat_price"><span class="c_f">Vanaf</span><span class="c_t"><?php echo '€'.$cat_price; ?></span></div>
-						<a class="bestelButton patBlHor" href="<?php echo get_template_directory_uri();?>/order-action.php/?single_cat=<?php echo $cat_name;?>">BESTEL HIER</a>
-					</div>
+            	<div class="col span_3-1" id="new<?php echo $i; ?>">
+                    <div class="cat_img"><img src="<?php echo $cat_image['url'];?>"></div>
+                    <div class="cat_tit"><h2><?php echo $cat_name; ?></h2></div>
+                    <div class="cat_price"><span class="c_f">Vanaf</span><span class="c_t"><?php echo '€'.$cat_price; ?></span></div>
+                    <a class="bestelButton patBlHor" href="<?php echo get_template_directory_uri();?>/order-action.php/?single_cat=<?php echo $cat_name;?>">BESTEL HIER</a>
 				</div>
 
 			<?php			} 
@@ -87,33 +87,6 @@ get_header();
 		
 		?>
 		
-        
-        
-<!--
-		<?php
-			$i = 0;
-			$category_ids = array(2,4,3);
-			foreach($category_ids as $cat_id)  { ?>
-				<div class="part" id="new<?php echo $i; ?>">
-					<div class="cat_con">
-						<?php $cat_name = get_cat_name($cat_id);	
-			   			      $my_category_id = $cat_id->term_id; 
-							  $term = get_queried_object();
-							  $cat_image1 = get_field('category_image', $cat_id);
- 		                      $cat_image = get_field('category_image', 'category_'.$category->term_id);	
-							  $cat_price = get_field('category_price', $cat_id);	
-
-						?>
-                        print: <?php print_r($cat_image1); ?> echo: <?php echo $cat_image1; ?>
-						<div class="cat_img"><img src="<?php echo $cat_image1['url']; ?>"></div>
-						<div class="cat_tit"><h2><?php echo $cat_name; ?></h2></div>
-						<div class="cat_price"><span class="c_f">Vanaf</span><span class="c_t"><?php echo '€'.$cat_price. 'id'.$cat_id; ?></span></div>
-						<a class="bestelButton patBlHor" href="<?php echo get_template_directory_uri();?>/order-action.php/?single_cat=<?php echo $cat_name;?>">BESTEL HIER</a>
-					</div>
-				</div>
-		<?php $i++;	} ?>
--->
-
         </div>
     </section>
 	<section id="highlights" class="section patOrHor">
@@ -157,7 +130,7 @@ get_header();
                 </div>
             </div>
             
-            <a class="bestelButton patBlHor" href="<?php echo get_permalink('5'); ?>">Bekijk uitgebreide uitleg</a>
+            <a class="bestelButton patBlHor" href="<?php echo get_permalink('227'); ?>">Bekijk uitgebreide uitleg</a>
             
         </div>
     </section>

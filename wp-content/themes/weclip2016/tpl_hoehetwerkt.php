@@ -4,7 +4,7 @@ Template Name: Hoe het werkt
 */
 get_header();
 ?>
-    <header id="header" class="header" role="banner" itemscope="itemscope" itemtype="http://schema.org/Organization">
+    <header id="header" class="header patOrHor" role="banner" itemscope="itemscope" itemtype="http://schema.org/Organization">
         <?php
         if (has_post_thumbnail()){
             the_post_thumbnail('header');
@@ -42,15 +42,15 @@ get_header();
                 </span>
             </div>
               
-
     </header>
 
 
-	<main class="content alternates" role="main" itemprop="mainContentOfPage">
+	<main class="content" role="main" itemprop="mainContentOfPage">
 		<?php if(have_posts()) : while(have_posts()) : the_post(); ?>
 		<div class="row titleRow">
         	 <h1 itemprop="headline" class="basic"><?php the_title(); ?></h1>
         </div>
+        <div class="alternates">
         <section class="section odd patOrHor">
         	<img src="<?php bloginfo('template_directory'); ?>/gfx/how_1.png" alt="Complexiteit bepalen" class="icon" />
             <div class="row-pad" itemprop="text">
@@ -86,6 +86,7 @@ get_header();
                 <p>Afhankelijk van de gekozen service krijgt u 24 uur of 5 dagen later van ons een mailtje met een downloadlink. De factuur volgt later!</p>
             </div>
         </section>
+        </div>
 		<?php endwhile; endif; ?>
 	</main> <!-- .article -->
 	

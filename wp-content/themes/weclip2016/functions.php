@@ -70,18 +70,7 @@ if( !is_admin() ) {
 function load_styles_scripts() {
     if( !is_admin()) {
 		wp_enqueue_script( 'global', get_template_directory_uri() . '/js/global.js', array('jquery'), '', true );
-		wp_enqueue_script( 'tools', get_template_directory_uri() . '/js/jquery.tools.min.js', array('jquery'), '', true );
-		wp_enqueue_script( 'tabs', get_template_directory_uri() . '/js/jquery-ilc-tabs.js', array('jquery'), '', true );
-		wp_enqueue_script( 'scrolltabs', get_template_directory_uri() . '/js/scrolltabs.js', array('jquery'), '', true );
-		wp_enqueue_script( 'navigation', get_template_directory_uri() . '/js/navigation.js', array('jquery'), '', true );
 	}
-  if ( is_page('25') && !is_admin()) {
-		wp_enqueue_style( 'order', get_template_directory_uri() . '/functions/order.css',false,'','all');
-		wp_enqueue_script( 'ui', get_template_directory_uri() . '/js/jquery-ui-1.10.3.custom.min.js', array('jquery'), '', true );
-		wp_enqueue_script( 'weclip_order', get_template_directory_uri() . '/js/weclip_order.js', array('jquery'), '', true );
-	  
-  }
-	
 	
 }
 add_action( 'wp_enqueue_scripts', 'load_styles_scripts' );
@@ -138,7 +127,6 @@ add_filter ( 'post_class' , 'oddeven_post_class' );
 global $current_class;
 $current_class = 'odd';
 */
-
 
 
 

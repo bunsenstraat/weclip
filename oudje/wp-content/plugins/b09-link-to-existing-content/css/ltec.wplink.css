@@ -1,0 +1,53 @@
+#wp-link #link-options label span.label-shortcode {
+	display: none;
+}
+#wp-link label {
+	position: relative;
+}
+#wp-link #link-options label.has-shortcode span.label-url {
+	display: none;
+}
+#wp-link #link-options label.has-shortcode span.label-shortcode {
+	display: inline-block;
+}
+#wp-link #clear-shortcode-button {
+	font: 400 20px/36px dashicons;
+	display: block;
+	font-size: 1.2em;
+	width: 30px;
+	height: 25px;
+	text-align: center;
+	position: absolute;
+	top: -4px;
+	right: 0;
+	line-height: 25px;
+	color: #666;
+	display: none;
+}
+#wp-link #clear-shortcode-button:hover {
+	color: #000;
+}
+#wp-link #clear-shortcode-button:after {
+	content: "\f158";
+}
+
+#wp-link label.has-shortcode #clear-shortcode-button {
+	display: block;
+}
+
+
+.link-search-wrapper label {
+	float: left;
+	margin: 0 0 4px 0;
+}
+#wp-link .query-results {
+	top: 235px !important;
+}
+#wp-link .link-search-field {
+	max-width: none !important;
+}
+@media screen and (max-width: 782px) {
+	#wp-link .query-results {
+		top: 260px !important;
+	}
+}

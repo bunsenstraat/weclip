@@ -201,19 +201,31 @@ if (!isset($_SESSION['ordersession'])) {
 $i = 2;
 ?>
 <div class="order_title">
-	<div class="title_content">
+	<div class="row title_content">
+        <h1 class="step_line">
+            <span class="first-line">
+                <?php 
+                if (get_field('streamer_line1')) {
+                    echo get_field('streamer_line1');
+                }
+                else {
+                    echo "Gemakkelijk" ;
+                } ?>
+            </span>
+             <span class="second-line">
+                <?php 
+                if (get_field('streamer_line2')) {
+                    echo get_field('streamer_line2');
+                }
+                else {
+                    echo "Online Bestellen" ;
+                } ?>
+            </span>
+            <span class="third-line"><?php echo $_SESSION['steps']; ?></span>
+        </h1>
+	</div><!-- end .order_title -->
+</div><!-- end .title_content -->
 
-		<h1 class="step_line1">
-			<span class="first-line">Gemakkelijk</span>
-			<span class="second-line">ONLINE BESTELLEN</span>
-			<span class="third-line">
-				<img class="title_b_l" src="<?php bloginfo('template_directory'); ?>/images/tit_bor.png" />
-				<span class="tit_span"><?php echo $_SESSION['steps']; ?></span>
-				<img class="title_b_r" src="<?php bloginfo('template_directory'); ?>/images/tit_bor.png" />
-			</span>
-		</h1>
-	</div>
-</div>
 <div class="order_content">
 <style style="text/css">
   #wizard li {
@@ -233,16 +245,19 @@ cursor:pointer;
 </style>
     <div id="progress">
     	<div id="progress-bg"></div>
-    	<ul id="bar">
-	      <li id="first" class="active1">STAP 1</li>
-	      <li id="second">STAP 2</li>
-	      <li id="third">STAP 3</li>
-	      <li id="forth">STAP 4</li>
-          <li id="five">STAP 5</li>
-        </ul>
+        <div class="row">
+            <ul id="bar">
+              <li id="first" class="active1">STAP 1</li>
+              <li id="second">STAP 2</li>
+              <li id="third">STAP 3</li>
+              <li id="forth">STAP 4</li>
+              <li id="five">STAP 5</li>
+            </ul>
+        </div>
     </div>
+    
 	<div id="wizard">	
-	<div class="items">
+	<div class="row">
 <?php if(isset($_SESSION['pg1'])){
 unset($_SESSION['pg2']);
 unset($_SESSION['pg3']);
@@ -274,7 +289,7 @@ unset($_SESSION['m']);
 									      $cat_price = $custom_Price[0]->field_value; 
 									?>
 									<div class="cat_img"><img src="<?php echo $current_peer_arr[0]; ?>" /></div>
-									<div class="cat_price"><h2 class="c_t"><?php echo '€'.$cat_price; ?></h2></div>									<img class="title_b_l" src="<?php bloginfo('template_directory'); ?>/images/SFDFRS.png" />
+									<div class="cat_price"><h2 class="c_t"><?php echo '€'.$cat_price; ?></h2></div>									<img class="title_b_l" src="<?php bloginfo('template_directory'); ?>/gfx/SFDFRS.png" />
 									<div class="cat_tit"><h2><?php echo $cat_name; ?></h2></div>
 									
 								</div>
@@ -361,14 +376,14 @@ $tiff = $_SESSION['tiff'];
 				<h3>KIES UW EXTRA'S</h3>
 				<div style="position:relative;float:left;width:40%;padding:0px;height: 145px;">				
 				<ul>
-					<li><input style="display:none;" class="stp_f1_<?php echo $j; ?>" type="checkbox" name="schaduw<? echo $j;?>" value="ja" <?php if($shad[$j]== "ja"){echo "checked"; } ?> /><span id="download_now_f_<?php echo $j; ?>" ><div id="stp_f_<?php echo $j; ?>">SCHADUW TOEVOEGEN</div><span class="price123_step "> €0.25 <img style="vertical-align: text-bottom;" class="step_m" src="<?php bloginfo('template_directory'); ?>/images/price_price.png" /></span></span>
+					<li><input style="display:none;" class="stp_f1_<?php echo $j; ?>" type="checkbox" name="schaduw<? echo $j;?>" value="ja" <?php if($shad[$j]== "ja"){echo "checked"; } ?> /><span id="download_now_f_<?php echo $j; ?>" ><div id="stp_f_<?php echo $j; ?>">SCHADUW TOEVOEGEN</div><span class="price123_step "> €0.25 <img style="vertical-align: text-bottom;" class="step_m" src="<?php bloginfo('template_directory'); ?>/gfx/price_price.png" /></span></span>
 					<div class="tooltip_f_<?php echo $j; ?>">
 						<div class="ttol_tipse">
 							<span class="tool_font">SCHADUW</span>
 							<p>Een vrijstaand beeld lijkt vaak te zweven wat onnatuurlijk oogt. Wij kunnen een realistisch schaduw toevoegen om dit te voorkomen. Let op: Transparante schaduw is duurder, vraag naar de prijs. Meer info over <a href="<?php echo get_permalink(183); ?>" target="_blank">schaduw</a>.</p>
 							<div class="tool_img">
 								<div class="tool_img_one">								
-									<img src="<?php bloginfo('template_directory'); ?>/images/schaduw.png" />
+									<img src="<?php bloginfo('template_directory'); ?>/gfx/schaduw.png" />
 									<span class="img_span">GEEN SCHADUW</span>
 								</div>
 								<div class="tool_img_second">								
@@ -378,32 +393,32 @@ $tiff = $_SESSION['tiff'];
 						</div>	
 					</div>
 					<br /></li>
-					<li><input style="display:none;" class="stp_s1_<?php echo $j; ?>" type="checkbox" name="reflectie<? echo $j;?>" value="ja" <?php if($refl[$j]== "ja"){echo "checked"; } ?>><span id="download_now_<?php echo $j; ?>" ><div id="stp_s_<?php echo $j; ?>">REFLECTIE TOEVOEGEN</div><span class="price123_step "> €0.25 <img style="vertical-align: text-bottom;" class="step_m" src="<?php bloginfo('template_directory'); ?>/images/price_price.png" /></span></span>		
+					<li><input style="display:none;" class="stp_s1_<?php echo $j; ?>" type="checkbox" name="reflectie<? echo $j;?>" value="ja" <?php if($refl[$j]== "ja"){echo "checked"; } ?>><span id="download_now_<?php echo $j; ?>" ><div id="stp_s_<?php echo $j; ?>">REFLECTIE TOEVOEGEN</div><span class="price123_step "> €0.25 <img style="vertical-align: text-bottom;" class="step_m" src="<?php bloginfo('template_directory'); ?>/gfx/price_price.png" /></span></span>		
 				<div class="tooltip_<?php echo $j; ?>">
 					<div class="ttol_tipse">
 							<span class="tool_font">REFLECTIE</span>
 							<p>Reflectie is een weerspiegeling van het product alsof het op een reflecterend oppervlak staat. Meer info over <a href="<?php echo get_permalink(192); ?>" target="_blank">reflectie</a>.</p>
 							<div class="tool_img">
 								<div class="tool_img_one">								
-									<img src="<?php bloginfo('template_directory'); ?>/images/tool1.png" />
+									<img src="<?php bloginfo('template_directory'); ?>/gfx/tool1.png" />
 									<span class="img_span" style="padding-left: 2px;padding-top: 17px;">GEEN REFLECTIE</span>
 								</div>
 								<div class="tool_img_second">								
-									<img src="<?php bloginfo('template_directory'); ?>/images/tool2.png" />
+									<img src="<?php bloginfo('template_directory'); ?>/gfx/tool2.png" />
 									<span class="img_span" style="padding-top: 15px;">WEL REFLECTIE</span>
 								</div>
 							</div>
 						</div>	
 					</div>
 					<br /></li>
-			 		<li><input style="display:none;" class="stp_t1_<?php echo $j; ?>" type="checkbox" name="achtergrond<? echo $j;?>" value="ja" <?php if($back[$j]== "ja"){echo "checked"; } ?>><span id="download_now_t_<?php echo $j; ?>" ><div id="stp_t_<?php echo $j; ?>">ACHTERGROND PLAATSEN</div><span class="price123_step"> €0.25 <img style="vertical-align: text-bottom;" class="step_m" src="<?php bloginfo('template_directory'); ?>/images/price_price.png" /></span></span>
+			 		<li><input style="display:none;" class="stp_t1_<?php echo $j; ?>" type="checkbox" name="achtergrond<? echo $j;?>" value="ja" <?php if($back[$j]== "ja"){echo "checked"; } ?>><span id="download_now_t_<?php echo $j; ?>" ><div id="stp_t_<?php echo $j; ?>">ACHTERGROND PLAATSEN</div><span class="price123_step"> €0.25 <img style="vertical-align: text-bottom;" class="step_m" src="<?php bloginfo('template_directory'); ?>/gfx/price_price.png" /></span></span>
 					<div class="tooltip_t_<?php echo $j; ?>">
 					<div class="ttol_tipse">
 							<span class="tool_font">ACHTERGROND</span>
 							<p>Normaal gesproken leveren wij de beelden transparant of tegen een witte achtergrond. Wij kunnen een andere achtergrond plaatsen, een kleur, verloop of afbeelding. Meer info over <a href="<?php echo get_permalink(230); ?>" target="_blank">achtergrond plaatsen</a>.</p>
 							<div class="tool_img">
 								<div class="tool_img_one">								
-									<img src="<?php bloginfo('template_directory'); ?>/images/achtergrond.png" />
+									<img src="<?php bloginfo('template_directory'); ?>/gfx/achtergrond.png" />
 									<span class="img_span">GEEN ACHTERGROND</span>
 								</div>
 								<div class="tool_img_second">								
@@ -418,14 +433,14 @@ $tiff = $_SESSION['tiff'];
 				<div style="position:relative;float:left;width:40%;padding:0px;height: 145px;">				
 				<ul>
 					<li><input style="display:none;" class="stp_fo1_<?php echo $j; ?>" type="checkbox" name="kraagje<? echo $j;?>" value="ja" <?php if($kraa[$j]== "ja"){echo "checked"; } ?>>
-					<span id="download_now_fo_<?php echo $j; ?>"><div id="stp_fo_<?php echo $j; ?>">KRAAGJE TOEVOEGEN</div><span class="price123_step "> €0.50 <img style="vertical-align: text-bottom;" class="step_m" src="<?php bloginfo('template_directory'); ?>/images/price_price.png" /></span></span>
+					<span id="download_now_fo_<?php echo $j; ?>"><div id="stp_fo_<?php echo $j; ?>">KRAAGJE TOEVOEGEN</div><span class="price123_step "> €0.50 <img style="vertical-align: text-bottom;" class="step_m" src="<?php bloginfo('template_directory'); ?>/gfx/price_price.png" /></span></span>
 					<div class="tooltip_fo_<?php echo $j; ?>">
 					<div class="ttol_tipse">
 							<span class="tool_font">MONTAGE</span>
 							<p>Beelden van kleding op een model of paspop missen vaak het kraagje. Indien u een belde van de achterkant heeft kunnen wij een kraagje terugplaatsen. Meer info over <a href="<?php echo get_permalink(225); ?>" target="_blank">MONTAGE</a>.</p>
 							<div class="tool_img">
 								<div class="tool_img_one">								
-									<img src="<?php bloginfo('template_directory'); ?>/images/Kraagje.png" />
+									<img src="<?php bloginfo('template_directory'); ?>/gfx/Kraagje.png" />
 									<span class="img_span">GEEN KRAAGJE</span>
 								</div>
 								<div class="tool_img_second" >								
@@ -435,14 +450,14 @@ $tiff = $_SESSION['tiff'];
 						</div>	
 					</div>
 					<br /></li>
-					<li><input style="display:none;" class="stp_fi1_<?php echo $j; ?>" type="checkbox" name="afmetingen<? echo $j;?>" value="ja" <?php if($afme[$j]== "ja"){echo "checked"; } ?>><span id="download_now_fi_<?php echo $j; ?>" ><div id="stp_fi_<?php echo $j; ?>">AFMETINGEN AANPASSEN</div><span class="price123_step "> €0.25 <img style="vertical-align: text-bottom;" class="step_m" src="<?php bloginfo('template_directory'); ?>/images/price_price.png" /></span></span>
+					<li><input style="display:none;" class="stp_fi1_<?php echo $j; ?>" type="checkbox" name="afmetingen<? echo $j;?>" value="ja" <?php if($afme[$j]== "ja"){echo "checked"; } ?>><span id="download_now_fi_<?php echo $j; ?>" ><div id="stp_fi_<?php echo $j; ?>">AFMETINGEN AANPASSEN</div><span class="price123_step "> €0.25 <img style="vertical-align: text-bottom;" class="step_m" src="<?php bloginfo('template_directory'); ?>/gfx/price_price.png" /></span></span>
 					<div class="tooltip_fi_<?php echo $j; ?>">
 					<div class="ttol_tipse">
 							<span class="tool_font">AFMETINGEN</span>
 							<p>Soms is het handig om de beelden kant en klaar op een bepaald formaat te ontvangen. Mij schalen of snijden u beeld bij naar een maat of verhouding.</p>
 							<div class="tool_img">
 								<div class="tool_img_one">								
-									<img src="<?php bloginfo('template_directory'); ?>/images/afmeting.png" />
+									<img src="<?php bloginfo('template_directory'); ?>/gfx/afmeting.png" />
 									<span class="img_span">GEEN AFMETINGEN</span>
 								</div>
 								<div class="tool_img_second">								
@@ -452,14 +467,14 @@ $tiff = $_SESSION['tiff'];
 						</div>	
 					</div>
 					<br /></li>
-					<li><input style="display:none;" class="stp_si1_<?php echo $j; ?>" type="checkbox" name="onderwerp<? echo $j;?>" value="ja" <?php if($onde[$j]== "ja"){echo "checked"; } ?>><span id="download_now_si_<?php echo $j; ?>" ><div id="stp_si_<?php echo $j; ?>">ONDERWERP RECHT ZETTEN</div><span class="price123_step "> €0.15 <img style="vertical-align: text-bottom;" class="step_m" src="<?php bloginfo('template_directory'); ?>/images/price_price.png" /></span></span>
+					<li><input style="display:none;" class="stp_si1_<?php echo $j; ?>" type="checkbox" name="onderwerp<? echo $j;?>" value="ja" <?php if($onde[$j]== "ja"){echo "checked"; } ?>><span id="download_now_si_<?php echo $j; ?>" ><div id="stp_si_<?php echo $j; ?>">ONDERWERP RECHT ZETTEN</div><span class="price123_step "> €0.15 <img style="vertical-align: text-bottom;" class="step_m" src="<?php bloginfo('template_directory'); ?>/gfx/price_price.png" /></span></span>
 					<div class="tooltip_si_<?php echo $j; ?>">
 					<div class="ttol_tipse">
 							<span class="tool_font">ONDERWERP</span>
 							<p>Staan uw beelden scheef of zijn ze gekanteld gefotografeerd? Wij zetten ze recht voor u.	</p>
 							<div class="tool_img">
 								<div class="tool_img_one">								
-									<img src="<?php bloginfo('template_directory'); ?>/images/recht-zetten.png" />
+									<img src="<?php bloginfo('template_directory'); ?>/gfx/recht-zetten.png" />
 									<span class="img_span">GEEN ONDERWERP</span>
 								</div>
 								<div class="tool_img_second" style="padding-left: 8px;padding-top: 114px; margin-left: 0;

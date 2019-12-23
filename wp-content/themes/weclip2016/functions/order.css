@@ -3,61 +3,10 @@
     background-repeat: repeat-x;
     height: 170px;
 }
-.order_title h1.title {
-    color: #1E293B;
-    font-family: lobster;
-    font-size: 50px;
-    font-weight: normal;
-    position: relative;
-    z-index: 1;
-}
-.order_title .title_content .title_back {
-    background-image: url("../gfx/order_tit.png");
-    background-position: center center;
-    background-repeat: no-repeat;
-    color: white;
-    height: 46px;
-    position: relative;
-    top: -4px;
-}
-.order_title .title_content .title_b { }
-.order_title .title_back h1 {
-    font-family:"museo-sans-n5", "museo-sans", arial;
-    font-size: 27px;
-    font-weight: 500;
-    letter-spacing: 0;
-    padding-top: 11px;
-}
-.order_title .title_b_l {
-    height: 2px;
-    left: -153px;
-    position: relative;
-    top: 0;
-    width: 21px;
-}
-.order_title .title_b h1 {
-    color: #1E293B;
-    font-family: oldstandard;
-    font-size: 21px;
-    font-weight: normal;
-    position: relative;
-    top: -14px;
-}
-.order_title .title_b_r {
-    height: 2px;
-    position: relative;
-    right: -153px;
-    top: -35px;
-    width: 21px;
-}
-.order_content {
-	 background-image: url("../gfx/step_back.png");
-}
 #wizard {
 margin: 20px auto 0;
     overflow: hidden;
     position: relative;
-    width: 960px;
 }
 #status {
     background: url("../gfx/order_title_n.png") repeat-x scroll 0 0 #112233;
@@ -97,17 +46,6 @@ margin: 20px auto 0;
     list-style-type: none;
     margin-bottom: 25px;
 }
-#wizard .items {
-    clear: both;
-    left: 0;
-    position: relative;
-    width: 20000em;
-}
-#wizard .page {
-    float: left;
-    height: auto;
-    width: 960px;
-}
 #wizard h2 {
     font-size: 22px;
     margin: 10px 0 0;
@@ -142,7 +80,7 @@ margin: 20px auto 0;
 #progress { width:100%; height:47px; padding:0; background:#EB4819; position:relative}
 #progress-bg {width:50%; height:47px; position:absolute; left:50%; z-index:101; background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAADCAYAAABS3WWCAAAAEklEQVQIW2M01rH4zyinaQ0hAB8dBJwaRZAOAAAAAElFTkSuQmCC") repeat}
 #progress-bg.active { background-image:none; background-color:#EB4819}
-#bar { z-index:102; max-width:960px; margin:0 auto; position:relative;}
+#bar { z-index:102; width:100%; margin:0 auto; position:relative;}
 #bar li {color:#fff;background: url(../gfx/progress-bar-bg.png) no-repeat left -47px; line-height:47px;list-style-image: none;list-style-type: none; float:left; text-align:center; width:20%; margin-left:-20px; 	font-family:"museo-sans-n5", "museo-sans", arial;	font-weight:500;font-style:normal;text-transform: uppercase;}
 #bar li.active { background-position:left -0}
 #bar li.active:first-child { background-image:none; background-color:#EB4819}

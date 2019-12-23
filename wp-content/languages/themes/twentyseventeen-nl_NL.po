@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Themes - Twenty Seventeen package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2017-11-16 15:35:52+0000\n"
+"PO-Revision-Date: 2019-02-18 14:53:16+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -59,13 +59,13 @@ msgstr "Pauzeer achtergrond video"
 msgid "Play background video"
 msgstr "Speel achtergrond video af"
 
-#: inc/customizer.php:109
-msgid "When the two-column layout is assigned, the page title is in one column and content is in the other."
-msgstr "Wanneer de twee-kolommen layout is toegewezen, bevindt de pagina titel zich in de ene kolom en de content in de ander. "
-
 #: inc/template-tags.php:151
 msgid "Front Page Section %1$s Placeholder"
 msgstr "Hoofdpagina Sectie  %1$s Plaatsaanduiding"
+
+#: inc/customizer.php:109
+msgid "When the two-column layout is assigned, the page title is in one column and content is in the other."
+msgstr "Wanneer de twee-kolommen layout is toegewezen, bevindt de pagina titel zich in de ene kolom en de content in de ander. "
 
 #: single.php:34
 msgid "Next Post"
@@ -102,6 +102,19 @@ msgstr "door %s"
 msgid "Please define an SVG icon filename."
 msgstr "Bepaal een SVG icoon bestandsnaam."
 
+#: inc/icon-functions.php:39
+msgid "Please define default parameters in the form of an array."
+msgstr "Definieer alsjeblieft de standaard parameters in de vorm van een array."
+
+#: inc/customizer.php:143
+msgid "Select pages to feature in each area from the dropdowns. Add an image to a section by setting a featured image in the page editor. Empty sections will not be displayed."
+msgstr "Selecteer vanuit de uitklapmenu's in elk gebied de uit te lichten pagina's. Voeg een afbeelding toe aan een sectie door een uitgelichte afbeelding in te stellen in de editor. Lege secties worden niet getoond."
+
+#. translators: %d is the front page section number
+#: inc/customizer.php:142
+msgid "Front Page Section %d Content"
+msgstr "Voorpagina sectie %d inhoud"
+
 #: inc/customizer.php:112 inc/customizer.php:171
 msgid "Two Column"
 msgstr "Twee Kolommen"
@@ -134,19 +147,6 @@ msgstr "Kleurschema"
 msgid "Default Header Image"
 msgstr "Standaard Header Afbeelding"
 
-#: inc/icon-functions.php:39
-msgid "Please define default parameters in the form of an array."
-msgstr "Definieer alsjeblieft de standaard parameters in de vorm van een array."
-
-#. translators: %d is the front page section number
-#: inc/customizer.php:142
-msgid "Front Page Section %d Content"
-msgstr "Voorpagina sectie %d inhoud"
-
-#: inc/customizer.php:143
-msgid "Select pages to feature in each area from the dropdowns. Add an image to a section by setting a featured image in the page editor. Empty sections will not be displayed."
-msgstr "Selecteer vanuit de uitklapmenu's in elk gebied de uit te lichten pagina's. Voeg een afbeelding toe aan een sectie door een uitgelichte afbeelding in te stellen in de editor. Lege secties worden niet getoond."
-
 #: functions.php:360
 msgid "Footer 2"
 msgstr "Footer 2"
@@ -159,31 +159,39 @@ msgstr "Voeg hier widgets toe die getoond worden in je footer."
 msgid "Footer 1"
 msgstr "Footer 1"
 
-#: comments.php:62
-msgid "Reply"
-msgstr "Reageer"
-
-#: functions.php:64 functions.php:203
-#: template-parts/navigation/navigation-top.php:12
-msgid "Top Menu"
-msgstr "Bovenste Menu"
-
 #: functions.php:289
 msgctxt "Libre Franklin font: on or off"
 msgid "on"
 msgstr "on"
 
+#: template-parts/navigation/navigation-top.php:12 functions.php:64
+#: functions.php:203
+msgid "Top Menu"
+msgstr "Bovenste Menu"
+
+#: comments.php:62
+msgid "Reply"
+msgstr "Reageer"
+
+#: template-parts/post/content-none.php:28
+msgid "It seems we can&rsquo;t find what you&rsquo;re looking for. Perhaps searching can help."
+msgstr "Het lijkt erop dat wij niet kunnen vinden wat jij zoekt. Wellicht dat de zoekfunctie kan helpen."
+
 #: search.php:54
 msgid "Sorry, but nothing matched your search terms. Please try again with some different keywords."
 msgstr "Helaas, er waren geen overeenkomsten met jouw zoekopdracht. Probeer het opnieuw met enkele andere zoekwoorden."
 
-#: search.php:21 template-parts/post/content-none.php:17
-msgid "Nothing Found"
-msgstr "Niets gevonden"
-
 #: template-parts/post/content-none.php:24
 msgid "Ready to publish your first post? <a href=\"%1$s\">Get started here</a>."
 msgstr "Klaar om je eerste bericht te publiceren? <a href=\"%1$s\">Hier starten</a>."
+
+#: template-parts/post/content-none.php:17 search.php:21
+msgid "Nothing Found"
+msgstr "Niets gevonden"
+
+#: single.php:33
+msgid "Previous Post"
+msgstr "Vorig bericht"
 
 #: single.php:33 comments.php:71
 msgid "Previous"
@@ -193,33 +201,53 @@ msgstr "Vorige"
 msgid "Next"
 msgstr "Volgende"
 
-#: template-parts/post/content-none.php:28
-msgid "It seems we can&rsquo;t find what you&rsquo;re looking for. Perhaps searching can help."
-msgstr "Het lijkt erop dat wij niet kunnen vinden wat jij zoekt. Wellicht dat de zoekfunctie kan helpen."
+#: searchform.php:20
+msgctxt "submit button"
+msgid "Search"
+msgstr "Zoeken"
 
 #: searchform.php:19
 msgctxt "placeholder"
 msgid "Search &hellip;"
 msgstr "Zoeken &hellip;"
 
-#: searchform.php:20
-msgctxt "submit button"
-msgid "Search"
-msgstr "Zoeken"
+#: searchform.php:17
+msgctxt "label"
+msgid "Search for:"
+msgstr "Zoeken naar:"
 
-#: single.php:33
-msgid "Previous Post"
-msgstr "Vorig bericht"
+#: search.php:19
+msgid "Search Results for: %s"
+msgstr "Zoekresultaten voor: %s"
+
+#. translators: %s: Name of current post
+#: template-parts/page/content-front-page-panels.php:45
+#: template-parts/page/content-front-page.php:42
+#: template-parts/post/content-audio.php:84 template-parts/post/content.php:57
+#: template-parts/post/content-gallery.php:71
+#: template-parts/post/content-video.php:83
+#: template-parts/post/content-image.php:61 functions.php:390
+msgid "Continue reading<span class=\"screen-reader-text\"> \"%s\"</span>"
+msgstr "<span class=\"screen-reader-text\">\"%s\"</span> verder lezen"
+
+#: inc/customizer.php:63
+msgid "Dark"
+msgstr "Donker"
 
 #: inc/back-compat.php:39 inc/back-compat.php:52 inc/back-compat.php:70
 msgid "Twenty Seventeen requires at least WordPress version 4.7. You are running version %s. Please upgrade and try again."
 msgstr "Twenty Sixteen vereist WordPress versie 4.4 of nieuwer. Je hebt versie %s. Gelieve deze bij te werken en probeer het dan opnieuw!"
 
-#: template-parts/post/content-gallery.php:78
-#: template-parts/post/content.php:64 template-parts/post/content-image.php:68
-#: template-parts/post/content-audio.php:91
-#: template-parts/post/content-video.php:90
+#. translators: %s: Name of current post
+#: inc/template-tags.php:117
+msgid "Edit<span class=\"screen-reader-text\"> \"%s\"</span>"
+msgstr "Bewerk <span class=\"screen-reader-text\">\"%s\"</span>"
+
 #: template-parts/page/content-page.php:26
+#: template-parts/post/content-audio.php:91 template-parts/post/content.php:64
+#: template-parts/post/content-gallery.php:78
+#: template-parts/post/content-video.php:90
+#: template-parts/post/content-image.php:68
 msgid "Pages:"
 msgstr "Pagina's:"
 
@@ -227,13 +255,13 @@ msgstr "Pagina's:"
 msgid "Menu"
 msgstr "Menu"
 
-#: functions.php:482
-msgid "Collapse child menu"
-msgstr "Alles inklappen"
-
 #: header.php:27
 msgid "Skip to content"
 msgstr "Naar de inhoud springen"
+
+#: functions.php:482
+msgid "Collapse child menu"
+msgstr "Alles inklappen"
 
 #: functions.php:481
 msgid "Expand child menu"
@@ -243,17 +271,35 @@ msgstr "Alles uitklappen"
 msgid "Social Links Menu"
 msgstr "Socialelinksmenu"
 
+#: template-parts/footer/site-info.php:19
+msgid "Proudly powered by %s"
+msgstr "Ondersteund door %s"
+
+#: footer.php:26
+msgid "Footer Social Links Menu"
+msgstr "Footer sociale links menu"
+
 #: comments.php:82
 msgid "Comments are closed."
 msgstr "Reacties zijn gesloten."
 
-#: index.php:54 archive.php:50 search.php:47
+#. translators: 1: number of comments, 2: post title
+#: comments.php:41
+msgctxt "comments title"
+msgid "%1$s Reply to &ldquo;%2$s&rdquo;"
+msgid_plural "%1$s Replies to &ldquo;%2$s&rdquo;"
+msgstr[0] "%1$s antwoord op &ldquo;%2$s&rdquo;"
+msgstr[1] "%1$s antwoorden op &ldquo;%2$s&rdquo;"
+
+#. translators: %s: post title
+#: comments.php:37
+msgctxt "comments title"
+msgid "One Reply to &ldquo;%s&rdquo;"
+msgstr "Eén antwoord op &ldquo;%s&rdquo;"
+
+#: archive.php:50 search.php:47 index.php:54
 msgid "Page"
 msgstr "Pagina"
-
-#: index.php:53 archive.php:49 search.php:46
-msgid "Next page"
-msgstr "Volgende pagina"
 
 #: 404.php:21
 msgid "Oops! That page can&rsquo;t be found."
@@ -263,36 +309,13 @@ msgstr "Oeps! Deze pagina kon niet worden gevonden."
 msgid "It looks like nothing was found at this location. Maybe try a search?"
 msgstr "Het lijkt erop dat er niets gevonden is op deze locatie. Probeer het eens met een zoekopdracht?"
 
-#: index.php:52 archive.php:48 search.php:45
+#: archive.php:48 search.php:45 index.php:52
 msgid "Previous page"
 msgstr "Vorige pagina"
 
-#: inc/customizer.php:63
-msgid "Dark"
-msgstr "Donker"
-
-#: template-parts/footer/site-info.php:19
-msgid "Proudly powered by %s"
-msgstr "Ondersteund door %s"
-
-#: footer.php:26
-msgid "Footer Social Links Menu"
-msgstr "Footer sociale links menu"
-
-#: searchform.php:17
-msgctxt "label"
-msgid "Search for:"
-msgstr "Zoeken naar:"
-
-#. translators: %s: Name of current post
-#: functions.php:390 template-parts/post/content-gallery.php:71
-#: template-parts/post/content.php:57 template-parts/post/content-image.php:61
-#: template-parts/post/content-audio.php:84
-#: template-parts/post/content-video.php:83
-#: template-parts/page/content-front-page.php:42
-#: template-parts/page/content-front-page-panels.php:45
-msgid "Continue reading<span class=\"screen-reader-text\"> \"%s\"</span>"
-msgstr "<span class=\"screen-reader-text\">\"%s\"</span> verder lezen"
+#: archive.php:49 search.php:46 index.php:53
+msgid "Next page"
+msgstr "Volgende pagina"
 
 #. Author of the theme
 msgid "the WordPress team"

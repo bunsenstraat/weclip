@@ -15,9 +15,19 @@
         <link rel="apple-touch-icon" sizes="152x152" href="<?php bloginfo('template_directory'); ?>/favicon-apple-touch-ipad-retina.png">
         <script src="https://use.typekit.net/tcu4hyh.js"></script>
 		<script>try{Typekit.load({ async: true });}catch(e){}</script>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-45484227-1"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+        
+          gtag('config', 'UA-45484227-1');
+        </script>
+
         <?php wp_head(); ?>
     </head>
-    <body <?php body_class(); ?>  itemscope="itemscope" itemtype="http://schema.org/WebPage">
+    <body <?php body_class('wclp'); ?>  itemscope="itemscope" itemtype="http://schema.org/WebPage">
         <div id="top" class="row">
             <div id="logo" class="col">
                 <a href="<?php echo home_url('/');?>"><img src="<?php bloginfo('template_directory'); ?>/gfx/weclip-logo.svg" alt="WeClip - Foto's vrijstaand maken" /></a>

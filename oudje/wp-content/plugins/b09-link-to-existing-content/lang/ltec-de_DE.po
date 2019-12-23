@@ -1,0 +1,149 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: B09 Link to existing Content\n"
+"POT-Creation-Date: 2013-05-28 13:57+0100\n"
+"PO-Revision-Date: 2013-05-28 13:58+0100\n"
+"Last-Translator: BASICS09 <info@basics09.de>\n"
+"Language-Team: BASICS09 <info@basics09.de>\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.5\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SearchPath-0: /Volumes/DataRasso/svn/b09-link-to-existing-content/"
+"trunk\n"
+
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/b09.link-to-existing-content.php:155
+#, php-format
+msgid "Archive for %s"
+msgstr "Archiv für %s"
+
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/b09.link-to-existing-content.php:201
+msgid "Insert/edit link"
+msgstr "Link einfügen/bearbeiten"
+
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/b09.link-to-existing-content.php:202
+msgid "Update"
+msgstr "Aktualisieren"
+
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/b09.link-to-existing-content.php:203
+msgid "Add Link"
+msgstr "Link einfügen"
+
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/b09.link-to-existing-content.php:204
+msgid "(no title)"
+msgstr "(kein Titel)"
+
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/b09.link-to-existing-content.php:205
+msgid "Posts"
+msgstr "Posts"
+
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/b09.link-to-existing-content.php:206
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/views/ltec.options.php:185
+msgid "Taxonomies"
+msgstr "Taxonomien"
+
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/b09.link-to-existing-content.php:207
+msgid "No matches found."
+msgstr "Keine Ergebnisse gefunden."
+
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/b09.link-to-existing-content.php:208
+msgid "Shortcode"
+msgstr "Shortcode"
+
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/b09.link-to-existing-content.php:209
+msgid "Add Shortcode"
+msgstr "Shortcode einfügen"
+
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/b09.link-to-existing-content.php:210
+msgid "Automatic, type here to customize..."
+msgstr "Automatisch, hier anpassen…"
+
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/b09.link-to-existing-content.php:211
+msgid "Search in"
+msgstr "Suchen in"
+
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/b09.link-to-existing-content.php:342
+msgid "Y/m/d"
+msgstr "Y/m/d"
+
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/b09.link-to-existing-content.php:377
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/views/ltec.options.php:245
+msgid "Instructions + FAQ"
+msgstr "Anleitung + FAQ"
+
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/views/ltec.options.php:24
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/views/ltec.options.php:130
+msgid "Options for Links to existing Content"
+msgstr "Einstellungen für Links auf bestehende Inhalte"
+
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/views/ltec.options.php:25
+msgid "Link to existing Content"
+msgstr "Links auf bestehende Inhalte"
+
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/views/ltec.options.php:56
+msgid "Options saved."
+msgstr "Einstellungen gespeichert."
+
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/views/ltec.options.php:146
+msgid "Content Types"
+msgstr "Inhalts-Typen"
+
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/views/ltec.options.php:149
+#, php-format
+msgid ""
+"Control what content types you want to appear in the %sOr link to existing "
+"content%s dialog. Selecting all has the same result as selecting none."
+msgstr ""
+"Kontrollieren Sie hier, welche Inhalts-Typen sie in dem %sOder verlinke auf "
+"bestehende Inhalte%s - Dialog erscheinen sollen. Wenn alle ausgewählt "
+"werden, hat das den selben Effekt, wie keinen auszuwählen."
+
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/views/ltec.options.php:159
+msgid "Post Types"
+msgstr "Post Typen"
+
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/views/ltec.options.php:161
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/views/ltec.options.php:187
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/views/ltec.options.php:215
+msgid ""
+"Your theme seems to have a filter running for this setting. Remove it to be "
+"able to edit it from here."
+msgstr ""
+"Im aktiven Theme scheint ein Filter für diese Einstellung zu laufen. "
+"Entfernen Sie ihn, um sie hier zu ändern."
+
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/views/ltec.options.php:206
+msgid "Other Options"
+msgstr "Andere Optionen"
+
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/views/ltec.options.php:213
+msgid "Shortcode Functionality"
+msgstr "Shortcode Funktionalität"
+
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/views/ltec.options.php:227
+msgid ""
+"Enable the plugin's built-in shortcode functionality. This will prevent "
+"links leading to 404-Pages, if the linked content doesn't exist anymore or "
+"if the site was moved to a different web address"
+msgstr ""
+"Die eingebaute Shortcode-Funktion des Plugins aktivieren. Dieses Feature "
+"beugt eventuell in der Zukunft auftretenden 404-Errors vor, zum Beispiel, "
+"wenn ein Post nicht mehr existiert, oder sich die website-Adresse geändert "
+"hat"
+
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/views/ltec.options.php:236
+msgid "Save Changes"
+msgstr "Einstellungen Speichern"
+
+#: /Volumes/DataRasso/svn/b09-link-to-existing-content/trunk/views/ltec.options.php:241
+msgid ""
+"The settings can all be overwritten from your functions.php using filters."
+msgstr ""
+"Die Einstellungen können alle in der functions.php anhand von Filtern "
+"überschrieben werden."
+
+#~ msgid "Categories"
+#~ msgstr "Kategorien"

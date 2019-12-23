@@ -1,0 +1,8 @@
+AuthUserFile /home/vhosting/y/vhost0062999/domains/weclip.nl/htdocs/www/slide/.htpasswd 
+AuthGroupFile /dev/null 
+AuthName "Uw clipvoorbeeld" 
+AuthType Basic
+
+<limit GET POST> 
+require valid-user 
+</limit>
