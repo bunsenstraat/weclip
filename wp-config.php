@@ -20,11 +20,11 @@ define('DB_NAME', 'weclip');
 
 
 /** MySQL database username */
-define('DB_USER', 'weclip_user');
+define('DB_USER', 'wp_site');
 
 
 /** MySQL database password */
-define('DB_PASSWORD', 'clipster');
+define('DB_PASSWORD', 'pmidWyrPQ5BE3HV9sPB4zA1IoWEyLzEN6d/hU9EdNqM');
 
 
 /** MySQL hostname */

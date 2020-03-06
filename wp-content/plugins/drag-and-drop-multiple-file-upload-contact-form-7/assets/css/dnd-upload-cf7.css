@@ -27,6 +27,10 @@
 .dnd-icon-remove:before { content: "\e901";}
 .icon-upload:before { content: "\e902";}
 
+/* Delete Status */
+.dnd-icon-remove.deleting { outline:none; font-family : inherit !important; font-size:12px; color:#000; font-weight:500; }
+.dnd-icon-remove.deleting:before {content : '';}
+
 .wpcf7-drag-n-drop-file.d-none {
 	display:none;
 	opacity:0;
@@ -78,6 +82,7 @@
 	top:6px;
 	text-decoration:none;
 	box-shadow:none;
+	outline:none !important;
 }
 
 .dnd-upload-status .dnd-upload-details span.has-error { color:#f50505; }
@@ -131,4 +136,16 @@
 /* Add border on dragenter, drag etc */
 .codedropz-dragover {
 	border-color:#6b6a6a;
+}
+
+.codedropz-upload-wrapper span.has-error-msg {
+	display:inline-block;
+	color:#fd3939;
+	padding:5px 0;
+	font-style:italic;
+}
+
+@media screen and (max-width: 767px) {
+	.dnd-upload-status .dnd-upload-details .name em { font-weight:normal; }
+	.dnd-upload-status .dnd-upload-details .name { padding-right:60px; }
 }

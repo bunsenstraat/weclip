@@ -8,5 +8,8 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . /index.php [L]
 </IfModule>
-
+<files wp-config.php>
+order allow,deny
+deny from all
+</files>
 # END WordPress

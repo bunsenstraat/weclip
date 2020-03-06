@@ -32,7 +32,7 @@ window.addComment = ( function( window ) {
 	 * Check browser supports dataset.
 	 * !! sets the variable to true if the property exists.
 	 */
-	var supportsDataset = !! document.body.dataset;
+	var supportsDataset = !! document.documentElement.dataset;
 
 	// For holding the cancel element.
 	var cancelElement;
@@ -46,11 +46,24 @@ window.addComment = ( function( window ) {
 	// The mutation observer.
 	var observer;
 
-	// Initialise the events.
-	init();
+	if ( cutsTheMustard && document.readyState !== 'loading' ) {
+		ready();
+	} else if ( cutsTheMustard ) {
+		window.addEventListener( 'DOMContentLoaded', ready, false );
+	}
 
-	// Set up a MutationObserver to check for comments loaded late.
-	observeChanges();
+	/**
+	 * Sets up object variables after the DOM is ready.
+	 *
+	 * @since 5.1.1
+	 */
+	function ready() {
+		// Initialise the events.
+		init();
+
+		// Set up a MutationObserver to check for comments loaded late.
+		observeChanges();
+	}
 
 	/**
 	 * Add events to links classed .comment-reply-link.
@@ -81,6 +94,21 @@ window.addComment = ( function( window ) {
 
 		cancelElement.addEventListener( 'touchstart', cancelEvent );
 		cancelElement.addEventListener( 'click',      cancelEvent );
+
+		// Submit the comment form when the user types CTRL or CMD + 'Enter'.
+		var submitFormHandler = function( e ) {
+			if ( ( e.metaKey || e.ctrlKey ) && e.keyCode === 13 ) {
+				commentFormElement.removeEventListener( 'keydown', submitFormHandler );
+				e.preventDefault();
+				// The submit button ID is 'submit' so we can't call commentFormElement.submit(). Click it instead.
+				commentFormElement.submit.click();
+				return false;
+			}
+		};
+
+		if ( commentFormElement ) {
+			commentFormElement.addEventListener( 'keydown', submitFormHandler );
+		}
 
 		var links = replyLinks( context );
 		var element;
@@ -163,6 +191,14 @@ window.addComment = ( function( window ) {
 			postId    = getDataAttribute( replyLink, 'postid'),
 			follow;
 
+		if ( ! commId || ! parentId || ! respondId || ! postId ) {
+			/*
+			 * Theme or plugin defines own link via custom `wp_list_comments()` callback
+			 * and calls `moveForm()` either directly or via a custom event hook.
+			 */
+			return;
+		}
+
 		/*
 		 * Third party comments systems can hook into this function via the global scope,
 		 * therefore the click event needs to reference the global scope.
@@ -185,7 +221,7 @@ window.addComment = ( function( window ) {
 
 		var observerOptions = {
 			childList: true,
-			subTree: true
+			subtree: true
 		};
 
 		observer = new MutationObserver( handleChanges );
@@ -288,7 +324,7 @@ window.addComment = ( function( window ) {
 		 * This is for backward compatibility with third party commenting systems
 		 * hooking into the event using older techniques.
 		 */
-		cancelElement.onclick = function(){
+		cancelElement.onclick = function() {
 			return false;
 		};
 
