@@ -1,0 +1,5 @@
+<Files wp-login.php>
+Order Deny,Allow
+Deny from all
+Allow from 212.83.92.214
+</Files>

@@ -83,7 +83,7 @@ class WPCF7SAdmin
                 <option value="0"><?php _e('Contact Form', 'contact-form-submissions'); ?></option>
                 <?php foreach ($forms as $post) {
                 ?>
-                    <?php $selected = ($post->ID == $_GET['wpcf7_contact_form']) ? 'selected' : ''; ?>
+                    <?php $selected = ($post->ID == esc_attr($_GET['wpcf7_contact_form'])) ? 'selected' : ''; ?>
                     <option value="<?php echo $post->ID; ?>" <?php echo $selected; ?>><?php echo $post->post_title; ?></option>
                 <?php
             } ?>
@@ -155,7 +155,7 @@ class WPCF7SAdmin
 
         // dynamically add cols if the user selects a form
         if (isset($_GET['wpcf7_contact_form']) && !empty($_GET['wpcf7_contact_form'])) {
-            $form_id = $_GET['wpcf7_contact_form'];
+            $form_id = esc_attr($_GET['wpcf7_contact_form']);
 
             $wpcf7s_columns = $this->get_available_columns($form_id);
 
@@ -196,7 +196,7 @@ class WPCF7SAdmin
                 <?php
                 break;
             default:
-                echo get_post_meta($post_id, $column, true);
+                echo esc_html(get_post_meta($post_id, $column, true));
                 break;
         }
     }
@@ -414,7 +414,7 @@ class WPCF7SAdmin
 
         $post_id = $wpdb->get_var("SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'form_id' AND meta_value = $form_id LIMIT 1;");
 
-        $columns = $wpdb->get_col("SELECT meta_key FROM wp_postmeta WHERE post_id = $post_id AND meta_key LIKE '%wpcf7s_%' GROUP BY meta_key");
+        $columns = $wpdb->get_col("SELECT meta_key FROM $wpdb->postmeta WHERE post_id = $post_id AND meta_key LIKE '%wpcf7s_%' GROUP BY meta_key");
 
         return $columns;
     }
@@ -481,7 +481,10 @@ class WPCF7SAdmin
                     }
 
                     $value = sanitize_text_field($value);
-                    $values[$key] = mb_convert_encoding($value, $charset);
+                    if(function_exists('mb_convert_encoding')){
+                        $value = mb_convert_encoding($value, $charset);
+                    }
+                    $values[$key] = $value;
 
                     // if we havent already stored this column, save it now
                     if(!in_array($key, $columns)){
@@ -502,7 +505,11 @@ class WPCF7SAdmin
                                 $files[] = "$upload_dir/wpcf7-submissions/$post_id/$singleFile";
                             }
                         }
-                        $values[$keyFile] = mb_convert_encoding(implode(',', $files), $charset);
+                        $files = implode(',', $files);
+                        if(function_exists('mb_convert_encoding')){
+                            $value = mb_convert_encoding($files, $charset);
+                        }
+                        $values[$keyFile] = $files;
 
                         // if we havent already stored this column, save it now
                         if(!in_array($keyFile, $columns)){
