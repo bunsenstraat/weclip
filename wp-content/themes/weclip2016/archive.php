@@ -2,42 +2,7 @@
 
     <header id="header" class="header patOrHor" role="banner" itemscope="itemscope" itemtype="http://schema.org/Organization">
 
-            <div class="step_line">
-                <span class="first-line">
-                    <?php 
-                    if (get_field('streamer_line1')) {
-                        echo get_field('streamer_line1');
-                    }
-                    else {
-                        echo "foto's" ;
-                    } ?>
-                </span>
-                 <span class="second-line">
-                    <?php 
-                    if (get_field('streamer_line2')) {
-                        echo get_field('streamer_line2');
-                    }
-                    else {
-                        echo "VRIJSTAAND" ;
-                    } ?>
-                </span>
-                <span class="third-line">
-                    <?php 
-                    if (get_field('streamer_line3')) {
-                        echo get_field('streamer_line3');
-                    }
-                    else {
-                        echo "maken" ;
-                    } ?>
-                    </span>
-                </span>
-            </div>
-
-    </header>
-
-
-	<main id="body-column" role="main" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
-		<div class="row">
+		<div class="row titleRow">
             <div class="step_content">
                 <?php $post = $posts[0]; // Hack. Set $post so that the_date() works. ?>
                 <?php /* If this is a category archive */ if (is_category()) { ?>
@@ -49,6 +14,11 @@
                 <?php } ?>
             </div>
 		</div>    
+
+    </header>
+
+
+	<main id="body-column" role="main" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
    
 		<?php if(have_posts()) : ?>
         

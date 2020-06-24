@@ -8,7 +8,7 @@ function wpcf7cf_admin_enqueue_scripts( $hook_suffix ) {
 	}
 
 	wp_enqueue_script('cf7cf-scripts-admin', wpcf7cf_plugin_url( 'js/scripts_admin.js' ),array('jquery-ui-autocomplete', 'jquery-ui-sortable'), WPCF7CF_VERSION,true);
-	wp_localize_script('cf7cf-scripts-admin', 'wpcf7cf_options_0', get_option(WPCF7CF_OPTIONS));
+	wp_localize_script('cf7cf-scripts-admin', 'wpcf7cf_options_0', wpcf7cf_get_settings());
 
 }
 
@@ -70,7 +70,22 @@ if (!function_exists('all_operator_options')) {
 
 function wpcf7cf_editor_panel_conditional($form) {
 
-	$form_id = $_GET['post'];
+	$settings = wpcf7cf_get_settings();
+	$is_text_only = $settings['conditions_ui'] === 'text_only';
+
+	// print_r($settings);
+
+	$form_id = isset($_GET['post']) ? $_GET['post'] : false;
+
+	if ($form_id === false) {
+		?>
+		    <div class="wpcf7cf-inner-container">
+				<h2><?php echo esc_html( __( 'Conditional fields', 'wpcf7cf' ) ); ?></h2>
+				<p>You need to save your form, before you can start adding conditions.</p>
+			</div>
+		<?php
+		return;
+	}
 
 	$wpcf7cf_entries = CF7CF::getConditions($form_id);
 
@@ -80,27 +95,44 @@ function wpcf7cf_editor_panel_conditional($form) {
 
 	?>
     <div class="wpcf7cf-inner-container">
-        <h2><?php echo esc_html( __( 'Conditional fields', 'wpcf7cf' ) ); ?></h2>
 
-        <?php
-        print_entries_html($form);
-        ?>
+		<label class="wpcf7cf-switch" id="wpcf7cf-text-only-switch">
+			<span class="label">Text mode</span>
+			<span class="switch">
+				<input type="checkbox" id="wpcf7cf-text-only-checkbox" name="wpcf7cf-text-only-checkbox" value="text_only" <?php echo $is_text_only ? 'checked':''; ?>>
+				<span class="slider round"></span>
+			</span>
+		</label>
 
-        <div id="wpcf7cf-entries">
-            <?php
-            print_entries_html($form, $wpcf7cf_entries);
-            ?>
+		<h2><?php echo esc_html( __( 'Conditional fields', 'wpcf7cf' ) ); ?></h2>
+
+		<div id="wpcf7cf-entries-ui" style="display:none">
+			<?php
+			print_entries_html($form);
+			?>
+			<div id="wpcf7cf-entries">
+				<?php
+				//print_entries_html($form, $wpcf7cf_entries);
+				?>
+			</div>
+			
+			<span id="wpcf7cf-add-button" title="add new rule">+ add new conditional rule</span>
+
+			<div id="wpcf7cf-a-lot-of-conditions" class="wpcf7cf-notice notice-warning" style="display:none;">
+				<p>
+					<strong>Wow, That's a lot of conditions!</strong><br>
+					You can only add up to <?php echo WPCF7CF_MAX_RECOMMENDED_CONDITIONS ?> conditions using this interface.
+					Please switch to <strong>Text mode</strong> if you want to add more than <?php echo WPCF7CF_MAX_RECOMMENDED_CONDITIONS ?> conditions.
+				</p>
+			</div>
+
 		</div>
-		
-        <span id="wpcf7cf-add-button" title="add new rule">+ add new conditional rule</span>
 
         <div id="wpcf7cf-text-entries">
-			<p><a href="#" id="wpcf7cf-settings-to-text">Text view</a></p>
             <div id="wpcf7cf-settings-text-wrap">
-                <textarea id="wpcf7cf-settings-text" name="wpcf7cf-settings-text"></textarea>
+
+                <textarea id="wpcf7cf-settings-text" name="wpcf7cf-settings-text"><?php echo CF7CF::serializeConditions($wpcf7cf_entries) ?></textarea>
                 <br>
-                <input type="button" value="Update fields">
-                <p><a href="#" id="wpcf7cf-settings-text-clear">Hide</a></p>
             </div>
         </div>
     </div>
@@ -198,8 +230,8 @@ function print_entries_html($form, $wpcf7cf_entries = false) {
 			    )
 		    )
 	    );
-    }
-
+	}
+	
 	foreach($wpcf7cf_entries as $i => $entry) {
 
 		// check for backwards compatibility ( < 2.0 )
@@ -210,13 +242,9 @@ function print_entries_html($form, $wpcf7cf_entries = false) {
 		$and_entries = array_values($wpcf7cf_entries[$i]['and_rules']);
 
 		if ($is_dummy) {
-?>
-        <div id="wpcf7cf-new-entry">
-<?php
+			echo '<div id="wpcf7cf-new-entry">';
         } else {
-?>
-        <div class="entry" id="entry-<?php echo $i ?>">
-<?php
+        	echo '<div class="entry">';
         }
 		?>
             <div class="wpcf7cf-if">
@@ -243,7 +271,7 @@ function print_entries_html($form, $wpcf7cf_entries = false) {
 				}
 				?>
             </div>
-        </div>
 		<?php
+		echo '</div>';
 	}
 }

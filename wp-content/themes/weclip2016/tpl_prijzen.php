@@ -24,41 +24,16 @@ get_header();
 ?>
     <header id="header" class="header patOrHor" role="banner" itemscope="itemscope" itemtype="http://schema.org/Organization">
         <?php
+		/*
         if (has_post_thumbnail()){
             the_post_thumbnail('header');
         }
+		*/
         ?>
 
-            <div class="step_line">
-                <span class="first-line">
-                    <?php 
-                    if (get_field('streamer_line1')) {
-                        echo get_field('streamer_line1');
-                    }
-                    else {
-                        echo "foto's" ;
-                    } ?>
-                </span>
-                 <span class="second-line">
-                    <?php 
-                    if (get_field('streamer_line2')) {
-                        echo get_field('streamer_line2');
-                    }
-                    else {
-                        echo "VRIJSTAAND" ;
-                    } ?>
-                </span>
-                <span class="third-line">
-                    <?php 
-                    if (get_field('streamer_line3')) {
-                        echo get_field('streamer_line3');
-                    }
-                    else {
-                        echo "maken" ;
-                    } ?>
-                    </span>
-                </span>
-            </div>
+		<div class="row titleRow">
+        	 <h1 itemprop="headline" class="basic"><?php the_title(); ?></h1>
+        </div>
               
 
     </header>
@@ -67,10 +42,6 @@ get_header();
 	<main class="content prices" role="main" itemprop="mainContentOfPage">
 		<div class="prices_content blueblock">
 		<?php if(have_posts()) : while(have_posts()) : the_post(); ?>
-        <div class="row titleRow">
-             <h1 itemprop="headline" class="basic"><?php the_title(); ?></h1>
-        </div>
-    
     
         <div class="row-pad">
             <p>Bij WeClip kunt u beelden vrijstaand laten maken tegen de laagste prijzen. Wij hanteren slechts drie prijscategorieën, hieronder vind u per categorie de prijs en enkele voorbeelden.</p>
@@ -95,12 +66,12 @@ get_header();
                             <h2><?php echo '€'.$cat_price; ?></h2>
                             <div class="underline"><?php echo $cat_name; ?></div>
                         </div>                
-                        <div class="cat_img"><img src="<?php echo $cat_image['url'];?>"></div>
+                        <div class="cat_img"><img src="<?php echo $cat_image['url'];?>" alt="<?php echo $cat_image['alt'];?>"></div>
                         <div class="cat_desc"><?php echo category_description($term); ?></div>
                         <a class="bestelButton patBlHor" href="<?php echo get_template_directory_uri();?>/order-action.php/?single_cat=<?php echo $cat_name;?>">BESTEL HIER</a>
                     
                         <div class="more_photo">
-                            <p>Zie enkele voorbeelden van productfoto's hieronder</p>
+                            <p>Hieronder enkele voorbeelden <span class="dicht">Klik om ze te zien</span></p>
                         </div>
                         <div class="examples">
                             <img class="title_b_l" src="<?php bloginfo('template_directory'); ?>/gfx/cat_<?php echo $cat_name ?>-1.png" alt="Voorbeeld vrijstaand beeld categorie basic" />
@@ -127,7 +98,8 @@ get_header();
 <div class="otherServices">
 	<div class="row">
 		<div class="step_content">
-			<h2 class="basic">OVERIGE TARIEVEN</h2>
+			<h2 class="basic"><?php the_field('overige_diensten_titel'); ?></h2>
+            <div class="uitleg row-pad"><?php the_field('overige_diensten_uitleg'); ?></div>
 		</div>
 
 		<div class="priceTable">
@@ -143,13 +115,14 @@ get_header();
                 $omschrijving_dienst = get_sub_field('omschrijving_dienst');
                 $afbeelding_dienst = get_sub_field('afbeelding_dienst');
                 $prijs_dienst = get_sub_field('prijs_dienst');
+                $prijs_link = get_sub_field('link');
                 ?>
                 <div class="tableRow body">
                     <div class="description"><span class="ttWrap"><?php echo $titel_dienst; ?> <img class="tticon" src="<?php bloginfo('template_directory'); ?>/gfx/tooltip.svg" />
 
                         <div class="tooltipContent">
                             <h3><?php echo $korte_titel; ?></h3>
-                            <p><?php echo $omschrijving_dienst; ?></p>
+      <p><?php echo $omschrijving_dienst; ?> <?php if($prijs_link) { echo '<a href="'. $prijs_link .'">Lees meer</a>';} ?></p>
                             <div class="tool_img">
                                 <img src="<?php echo $afbeelding_dienst['url']; ?>" alt="<?php echo $afbeelding_dienst['alt'] ?>" />
                                 <!-- <span class="img_span">GEEN</span>

@@ -3,7 +3,6 @@
 Template Name: Homepage 
 */
 get_header();
-
 		$args = array (
             'taxonomy' => 'category', //empty string(''), false, 0 don't work, and return empty array
             'orderby' => 'name',
@@ -24,7 +23,7 @@ get_header();
 ?>
     <header id="header" class="header patOrHor" role="banner" itemscope="itemscope" itemtype="http://schema.org/Organization">
 
-            <h1 class="step_line">
+            <h1 class="step_line" itemprop="headline">
                 <span class="first-line">
                     <?php 
                     if (get_field('streamer_line1')) {
@@ -54,6 +53,8 @@ get_header();
                     </span>
                 </span>
             </h1>
+            <div class="row-pad siteDescription"><?php the_field('ondertitel'); ?></div>
+            
               
 
     </header>
@@ -76,9 +77,9 @@ get_header();
 						
 				?>
             	<div class="col span_3-1" id="new<?php echo $i; ?>">
-                    <div class="cat_img"><img src="<?php echo $cat_image['url'];?>"></div>
+                    <div class="cat_img"><img src="<?php echo $cat_image['url'];?>" alt="<?php echo $cat_image['alt'];?>"></div>
                     <div class="cat_tit"><h2><?php echo $cat_name; ?></h2></div>
-                    <div class="cat_price"><span class="c_f">Vanaf</span><span class="c_t"><?php echo '€'.$cat_price; ?></span></div>
+                    <div class="cat_price"><span class="c_f">Prijs vrijstaand</span><span class="c_t"><?php echo '€'.$cat_price; ?></span></div>
                     <a class="bestelButton patBlHor" href="<?php echo get_template_directory_uri();?>/order-action.php/?single_cat=<?php echo $cat_name;?>">BESTEL HIER</a>
 				</div>
 
@@ -92,41 +93,41 @@ get_header();
 	<section id="highlights" class="section patOrHor">
 		<div class="row">
         	<a href="<?php echo get_permalink('25'); ?>/?pg1=1" class="probeer patBlHor">
-            	<div class="topLine">Benieuwd naar onze service?</div>
+            	<div class="topLine">Achtergrond verwijderen bij Weclip?</div>
                 <div class="star"></div>
                 <div class="bottomLine">Probeer nu gratis</div>
             </a>
         	<a href="<?php echo get_permalink('39'); ?>" class="offerte patOrHor">
             	<div class="icon patBlHor"></div>
-                <span class="topLine">WECLIP DOET MEER!<br />ZIE ONZE AANVULLENDE DIENSTEN</span>
+                <span class="topLine">WECLIP DOET MEER!<br />ONTDEK MAATWERK BEELDBEWERKING</span>
                 <span class="bottomLine">Vraag een offerte aan</span>
             </a>
         </div>
     </section>
 	<section id="howItWorks" class="section">
 		<div class="row titleRow">
-        	<h2 class="basic">Hoe het werkt</h2>
+        	<h2 class="basic">Hoe achtergrond verwijderen werkt</h2>
         </div>
 		<div class="row">
         	<div class="block span3">
-            	<img src="<?php bloginfo('template_directory'); ?>/gfx/step-1.jpg" class="stepIMG" alt="Step 1" />
+            	<img src="<?php bloginfo('template_directory'); ?>/gfx/step-1.jpg" class="stepIMG" alt="Ongewenste achtergrond foto" />
 				<div class="ruit">
                 	<div class="stepNumber"><span>1</span></div>                
                 	<div class="stepTitle">Ongewenste achtergrond?</div>                
                 </div>
             </div>
         	<div class="block span3">
-            	<img src="<?php bloginfo('template_directory'); ?>/gfx/step-2.jpg" class="stepIMG" alt="Step 1" />
+            	<img src="<?php bloginfo('template_directory'); ?>/gfx/step-2.jpg" class="stepIMG" alt="Goedkoop vrijstaand maken in 24 uur" />
 				<div class="ruit">
                 	<div class="stepNumber"><span>2</span></div>                
-                	<div class="stepTitle">24 <img class="watch" src="<?php bloginfo('template_directory'); ?>/gfx/watch.png" alt="24 uur"> uur</div>                
+                	<div class="stepTitle">24 <img class="watch" src="<?php bloginfo('template_directory'); ?>/gfx/watch.png" alt="Vrijstaand maken in 24 uur"> uur</div>                
                 </div>
             </div>
         	<div class="block span3">
-            	<img src="<?php bloginfo('template_directory'); ?>/gfx/step-3.jpg" class="stepIMG" alt="Step 1" />
+            	<img src="<?php bloginfo('template_directory'); ?>/gfx/step-3.jpg" class="stepIMG" alt="Foto's vrijstaand in webshop of folder" />
 				<div class="ruit">
                 	<div class="stepNumber"><span>3</span></div>                
-                	<div class="stepTitle">Uw foto's universeel</div>                
+                	<div class="stepTitle">Uw foto's vrijstaand</div>                
                 </div>
             </div>
             
@@ -139,7 +140,7 @@ get_header();
 		<div class="row">
 		<?php if(have_posts()) : while(have_posts()) : the_post(); ?>
             <div class="aboutIcon">
-                <img class="cut_big" src="<?php bloginfo('template_directory'); ?>/gfx/cut_big.png">	
+                <img class="cut_big" src="<?php bloginfo('template_directory'); ?>/gfx/cut_big.png" alt="Over beeldbewerking bij WeClip">	
             </div>
             <div class="page-content" itemprop="text">
                 <?php the_content(); ?>
@@ -155,10 +156,10 @@ get_header();
                 <img class="cut_big" src="<?php bloginfo('template_directory'); ?>/gfx/icon_big.svg">	
             </div>
             <div class="page-content logos" itemprop="text">
-				<div><img class="icon_s" src="<?php bloginfo('template_directory'); ?>/gfx/adidas.png" /></div>
-				<div><img class="icon_s" src="<?php bloginfo('template_directory'); ?>/gfx/bruna.png" /></div>
-				<div><img class="icon_s" src="<?php bloginfo('template_directory'); ?>/gfx/heineken.png" /></div>
-				<div><img class="icon_s" src="<?php bloginfo('template_directory'); ?>/gfx/interbakery.png" /></div>
+				<div><img class="icon_s" src="<?php bloginfo('template_directory'); ?>/gfx/adidas.png" alt="Adidas sneakers vrijstaand maken door Weclip" /></div>
+				<div><img class="icon_s" src="<?php bloginfo('template_directory'); ?>/gfx/bruna.png" alt="Kantoorartikelen van Bruna vrijstaand maken door Weclip" /></div>
+				<div><img class="icon_s" src="<?php bloginfo('template_directory'); ?>/gfx/heineken.png" alt="Reclamefoto's van Heineken vrijstaand maken door Weclip" /></div>
+				<div><img class="icon_s" src="<?php bloginfo('template_directory'); ?>/gfx/interbakery.png" alt="Bakkersproducten van Interbakery vrijstaand maken door Weclip" /></div>
 				<div><img class="icon_s" src="<?php bloginfo('template_directory'); ?>/gfx/bacardi.png" /></div>
 				<div><img class="icon_s" src="<?php bloginfo('template_directory'); ?>/gfx/nike.png" /></div>
 				<div><img class="icon_s" src="<?php bloginfo('template_directory'); ?>/gfx/casio.png" /></div>

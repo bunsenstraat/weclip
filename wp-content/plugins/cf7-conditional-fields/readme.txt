@@ -5,8 +5,8 @@ Author: Jules Colle
 Website: http://bdwm.be
 Tags: wordpress, contact form 7, forms, conditional fields
 Requires at least: 4.1
-Tested up to: 5.3
-Stable tag: 1.8.3
+Tested up to: 5.4.1
+Stable tag: 1.9.4
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -101,6 +101,51 @@ The conditional fields javascript code is loaded during wp_footer, so a call to 
 2. Defining rules to show/hide groups of input elements in the backend interface
 
 == Changelog ==
+
+= 1.9.4 (2020-06-23) =
+* Fixed bug: JS error when conditonal fields settings where not saved manually by the user.
+
+= 1.9.3 (2020-06-21) =
+* Ignore conditions where group or field name does not exist, instead of throwing an error
+* Get rid of PHP notice related to new settings
+* Something went wrong with SVN commit 1.9.1 and 1.9.2 (so although these version might show up, it's not really a valid version)
+
+= 1.9 (2020-06-21) =
+* Performance improvements
+* Added extra setting: "Conditional Fields UI". If you have a lot of conditions, set this to "Text mode" for better performance in the admin interface.
+* Improved styling on Conditional Fields Settings page
+* Improved [docs](https://conditional-fields-cf7.bdwm.be/)
+* Improved the [form tester](https://conditional-fields-cf7.bdwm.be/form-tester/)
+* PRO: Multistep bug that was causing checkboxes and multiselect to not trigger validation errors
+* PRO: Summary added support for files, checkboxes and multiselect
+* Added test to ensure that normal view entries are always converted to text view correctly
+
+= 1.8.7 (2020-06-01) =
+* PRO: Change auto-update mechanism
+* Some minor JS refactoring
+* Improved on some edge cases with `equals ""` and `not equals ""`
+* Improved test suites.
+
+= 1.8.6 (2020-04-18) =
+* Fixed: accidentally packed the entire jQuery library in scripts.js
+* Cleaned up some console.logs that was still hanging around in the code.
+
+= 1.8.5 (2020-04-17) =
+* Tested with WP 5.4
+* fix multiselect
+* fix required file field inside mutistep
+* allow group names to contain `.` and `:` (https://github.com/pwkip/contact-form-7-conditional-fields/issues/46)
+* fix possible conflicts with require_once 'init.php' (https://wordpress.org/support/topic/conflict-with-theme-because-of-require_once/)
+* Created some unit tests and integration tests, so hopefully no more regression bugs from now on! (next step: automated CI before publish)
+* Got rid of warnings and notices when creating a new form.
+* Fix small clear_on_hide bug with select field (https://github.com/pwkip/contact-form-7-conditional-fields/issues/51)
+* PRO: fix "not empty" when using first_as_label in select field. (closes guthub issue #48)
+* PRO: fix error with nested repeater buttons text
+* PRO: new version of plugin_update_checker, compatible with PHP 7.3+
+
+= 1.8.4 (2020-03-05) =
+* PRO: Multistep: Improve autoscroll behavior (Tried to make it smoother and less annoying)
+* PRO: Multistep: Add wpcf7-not-valid class to input fields as needed after step-validation. Removed some other useless classes.
 
 = 1.8.3 (2020-03-01) =
 * Fix JS error on submit (reported by [@wasi7186](https://wordpress.org/support/topic/js-uncaught-typeerror-when-form-is-submitted/))

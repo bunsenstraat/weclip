@@ -8,50 +8,28 @@ get_header();
 
     <header id="header" class="header patOrHor" role="banner" itemscope="itemscope" itemtype="http://schema.org/Organization">
         <?php
+		/*
         if (has_post_thumbnail()){
             the_post_thumbnail('header');
         }
+		*/
         ?>
 
-            <div class="step_line">
-                <span class="first-line">
-                    <?php 
-                    if (get_field('streamer_line1')) {
-                        echo get_field('streamer_line1');
-                    }
-                    else {
-                        echo "foto's" ;
-                    } ?>
-                </span>
-                 <span class="second-line">
-                    <?php 
-                    if (get_field('streamer_line2')) {
-                        echo get_field('streamer_line2');
-                    }
-                    else {
-                        echo "VRIJSTAAND" ;
-                    } ?>
-                </span>
-                <span class="third-line">
-                    <?php 
-                    if (get_field('streamer_line3')) {
-                        echo get_field('streamer_line3');
-                    }
-                    else {
-                        echo "maken" ;
-                    } ?>
-                    </span>
-                </span>
-            </div>
-              
+		<div class="row titleRow">
+        	 <h1 itemprop="headline" class="basic"><?php the_title(); ?></h1>
+        </div>
 
     </header>
 
 
 	<main id="extra" class="content " role="main" itemprop="mainContentOfPage">
-		<?php if(have_posts()) : while(have_posts()) : the_post(); ?>
-		<div class="row titleRow">
-        	 <h1 itemprop="headline" class="basic"><?php the_title(); ?></h1>
+		<?php if(have_posts()) : while(have_posts()) : the_post();
+		$hoofdicoon = get_field('hoofdicoon');
+		?>
+        <div class="iconWrap">
+            <div class="ruit ruitOutline">
+                <img src="<?php echo $hoofdicoon['url']; ?>" alt="<?php echo $hoofdicoon['alt'] ?>" />
+            </div>
         </div>
 		<div class="row-pad contentRow">
         	 <?php the_content(); ?>

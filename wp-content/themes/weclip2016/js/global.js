@@ -18,10 +18,17 @@ $(function(e) {
 			e("#primary").css({
 				 display: 'block'
 			});
+			e("#examples").css({
+				 display: 'block'
+			});
+			
 			e( "body" ).removeClass( "mobile" );
 		} else {
 			e("#primary").css({
 				display: 'none'
+			});
+			e("#examples").css({
+				 display: 'none'
 			});
 			e( "body" ).addClass( "mobile" );
 		}
@@ -34,8 +41,22 @@ $(function(e) {
         .toggleClass("expander expanded")
         .next().slideToggle(400);
     });
+    e(".more_photo").on("click", function(){
+        e(this)
+        .toggleClass("open dicht")
+        .next().slideToggle(400);
+    });
 
 
+$(".tticon").click(function(){
+	var  ob = $(this);
+	$(".tooltipContent").removeClass("active");
+	$(ob).next().hasClass("open")?true:$(ob).next().addClass("active").addClass("open");
+	$(".tooltipContent").each(function(i,e){
+		if(!$(e).hasClass("active"))$(e).removeClass("open");
+	})
+});
+  
 /* Settings gaan hier, zoals:
 
     e(window).resize(function() {

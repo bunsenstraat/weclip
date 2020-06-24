@@ -2,8 +2,8 @@
 Donate link : http://codedropz.com/donation
 Tags: drag and drop, contact form 7, ajax uploader, multiple file, upload, contact form 7 uploader
 Requires at least: 3.0.1
-Tested up to: 5.3.2
-Stable tag: 1.3.2
+Tested up to: 5.4.1
+Stable tag: 1.3.5.1
 Requires PHP: 5.2.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -37,16 +37,22 @@ Here's a little [DEMO](http://codedropz.com/contact).
 Checkout available features on **PRO version**.
 
 * Image Preview - Show Thumbnail for images
-* Auto Delete Files - After Form Submission
-  - 1 hour, 4 hours, 8 hours or 1 day etc
+* Auto Delete Files - After Form Submission 
+  - *(1 hour, 4 hours, 8 hours , days, months etc)*
 * Zip Files ( Compressed File )
-* Save Files To Media Library
+* Save Files to Wordpress Media Library
 * Change Upload Directory
-  - Generated Name - timestamp
+  - Generated Name - Timestamp
   - Random Folder
-  - By User ( *must login* )
-  - Custom Folder
-* Send to email as individual attachment, zip archive or as a links
+  - By User
+  - Custom Folder 
+* Send to email as individual attachment, ZIP archive or as a links
+* Chunks Upload *( Break large files into smaller Chunks )*
+* Max Total Size *( of all Uploaded Files )*
+* Parallel/Sequential Upload *( Number of files to simultaneously upload )*
+* Change Filename Pattern ({filename}, {ip_address}, {random}, {post_id}, {post_slug}, etc.)
+* Automatically Optimize Images
+* Able to Resize/Crop image (ie: 800x800)
 * Improved Security
 * Optimized Code and Performance
 * 1 Month Premium Support
@@ -55,7 +61,7 @@ You can get [PRO Version here](https://www.codedropz.com/purchase-plugin/)!
 
 ### Other Plugin You May Like
 
-* [Drag & Drop Multiple File Upload - WPForms](https://www.codedropz.com/drag-drop-file-uploader-wpforms/) 
+* [Drag & Drop Multiple File Upload - WPForms](https://www.codedropz.com/drag-drop-file-uploader-wpforms/)
 An extension for **WPForms** - Transform your simple file upload into beautiful **"Drag & Drop Multiple File Upload"**.
 
 == Frequently Asked Questions ==
@@ -66,19 +72,21 @@ For any bug reports go to <a href="https://wordpress.org/support/plugin/drag-and
 
 = How can I limit file size? =
 
-To limit file size in `multiple file upload` field generator under Contact Form 7, there's a field `File size limit (bytes)`. Please take note it should be `Bytes` you may use any converter just Google (MB to Bytes converter) default of this plugin is 5MB(5242880 Bytes).
+To limit file size in `multiple file upload` field generator under Contact Form 7, there's a field `File size limit (bytes)`.
+
+Please take note it should be `Bytes` you may use any converter just Google (MB to Bytes converter) default of this plugin is 5MB(5242880 Bytes).
 
 = How can I limit the number of files in my Upload? =
 
 You can limit the number of files in your file upload by adding this parameter `max-file:3` to your shortcode :
 
-Example: [mfile upload-file-344 max-file:3] - this option will limit the user to upload only 3 files.
+Example: *[mfile upload-file-344 max-file:3]* - this option will limit the user to upload only 3 files.
 
 = How can I Add or Limit file types =
 
 You can add or change file types in cf7 Form-tag Generator Options by adding `jpeg|png|jpg|gif` in `Acceptable file types field`.
 
-Example : [mfile upload-file-433 filetypes:jpeg|png|jpg|gif]
+Example : *[mfile upload-file-433 filetypes:jpeg|png|jpg|gif]*
 
 = How can I change text in Drag and Drop Uploading area? =
 
@@ -86,7 +94,7 @@ You can change text `Drag & Drop Files Here or Browse Files` text in Wordpress A
 
 = How can I change email attachment as links? =
 
-Go to WP Admin `Contact->Drag & Drop Upload` settings then check "Send Attachment as links?" option.
+Go to WP Admin `Contact -> Drag & Drop Upload` settings then check "Send Attachment as links?" option.
 
 To manage mail template, go to Contact Forms edit specific form and Select `Mail` tab. In Message Body add generated code from mfile. ( Example Below )
 
@@ -115,6 +123,54 @@ To install this plugin see below:
 6. Multiple Drag and Drop Fields - Front
 
 == Changelog ==
+
+= 1.3.5.1 =
+* Bug - Quick Fix ( Unable to submit form when acceptance field is set  )
+   - Issue if "additional settings" section added  this line: acceptance_as_validation: on
+
+= 1.3.5 =
+* Fixed - nonce issues when using Cache plugins.
+* Fixed - German Translation for ( Drag & Drop File Upload ) text.
+* Fixed - Submit button ( enable/disable ) when acceptance checkbox is added.
+* Modified - File Upload error message  ( display error code )
+
+= 1.3.4 =
+* Fixed - Removed uploaded files when item Inbound Messages "Permanently Deleted". 
+* Added -  Counter of how many files are uploaded ( ie: 4 of 10 )
+* New - Features allow to set Minimum File Upload.
+- ie : minimum upload:2, max upload:10 = [mfile* upload-file-669 min-file:2 max-file:10]
+* New - Added .htaccess file inside "wp_dndcf7_uploads" upload directory. ( prevent from direct access )
+- Options: -Indexes \n <Files *.php> \n deny from all \n </Files>
+* Fixed - File Attachments bug ( Issues on additional mail when (file attachment) is removed still send the file )
+
+= 1.3.3.3.2 =
+* Bugs - Fixed unable to submit form ( 500 Internal Server Error in response )
+
+= 1.3.3.3.1 =
+* Fixes - Minor updates (packed the wrong file)
+
+= 1.3.3.3 =
+* Fixed  - Security Issues ( Unrestricted File Upload to Remote Code Execution - Thanks to @Austin  )
+  -  Able bypass and upload file (remotely) by renaming to ie: shell.php% and modified supported_type to `jpg|png|php%`
+  - Solution : Added more security, check/validate file type and created new function 'dnd_cf7_validate_type' to determine if file name extension is valid or not.
+* New - Make 'deleting...' and 'remove' text translatable ( compatible using WPML String Translation ).
+
+= 1.3.3.2 =
+* Fixed  - PHP warning reported [here](https://wordpress.org/support/topic/php-warning-count-parameter-must-be-an-array-2/)
+
+= 1.3.3.1 =
+* Improved Security - ( Check valid filename & extensions, sanitations, Secured File deletions )
+* New - Allowed non ASCII file name
+* Improved styling on Progress Bar
+* Fixed - Conflict with WooCommerce Geo Location
+
+= 1.3.3 =
+* SECURITY UPDATES ( issues reported by : Robert L Mathews )
+- The issues inside `dnd_codedropz_upload_delete` function, that will execute any POST remotely.
+* Fixed - To accept russian, hebrew Filename
+* Modify Javascript `dnd-upload-cf7.js` attach the function to window so it can be available to call.
+* Added - Responsive style for `Drag & Drop` text on mobile devices.
+* Minimum Features - Coming Soon
 
 = 1.3.2 =
 * Fixed - Sanitized Admin Option Fields - For Security Reason

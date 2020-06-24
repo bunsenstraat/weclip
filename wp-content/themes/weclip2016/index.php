@@ -33,7 +33,6 @@
 			<div class="right"><?php previous_posts_link('Nieuwere berichten &raquo;') ?></div>
 		</div>
 		
-		
 
 <?php get_sidebar(); ?>
 

@@ -113,6 +113,12 @@ if( function_exists('acf_add_options_page') ) {
 	acf_add_options_page();
 	
 }
+// Move Yoast to bottom
+function yoasttobottom() {
+	return 'low';
+}
+add_filter( 'wpseo_metabox_prio', 'yoasttobottom');
+
 
 /* Voeg even en oneven classes toe aan de posts
 function oddeven_post_class ( $classes ) {

@@ -28,14 +28,16 @@
         <?php wp_head(); ?>
     </head>
     <body <?php body_class('wclp'); ?>  itemscope="itemscope" itemtype="http://schema.org/WebPage">
-        <div id="top" class="row">
-            <div id="logo" class="col">
-                <a href="<?php echo home_url('/');?>"><img src="<?php bloginfo('template_directory'); ?>/gfx/weclip-logo.svg" alt="WeClip - Foto's vrijstaand maken" /></a>
-            </div>
-            <div id="main-menu" class="col">
-                <div class="toggler expander" alt="Expand"></div>
-                <nav id="primary" class="menu" role="navigation" itemscope="itemscope" itemtype="http://schema.org/SiteNavigationElement" style="display:none">
-					<?php wp_nav_menu( array( 'theme_location' => 'primary', 'menu_class' => 'nav-menu', 'container' => ''  ) ); ?>
-                </nav>
-            </div>
-        </div><!-- end row -->
+        <div id="top">
+            <div class="row">
+                <div id="logo" class="col">
+                    <a href="<?php echo home_url('/');?>"><img src="<?php bloginfo('template_directory'); ?>/gfx/weclip-logo.svg" alt="WeClip - Foto's vrijstaand maken" /></a>
+                </div>
+                <div id="main-menu" class="col">
+                    <div class="toggler expander" alt="Expand"></div>
+                    <nav id="primary" class="menu" role="navigation" itemscope="itemscope" itemtype="http://schema.org/SiteNavigationElement" style="display:none">
+                        <?php wp_nav_menu( array( 'theme_location' => 'primary', 'menu_class' => 'nav-menu', 'container' => ''  ) ); ?>
+                    </nav>
+                </div>
+            </div><!-- end row -->
+        </div>

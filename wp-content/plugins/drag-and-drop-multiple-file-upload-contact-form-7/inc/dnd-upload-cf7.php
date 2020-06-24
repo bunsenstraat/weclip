@@ -17,8 +17,8 @@
 	add_action( 'wpcf7_init', 'dnd_cf7_upload_add_form_tag_file' );
 	add_action( 'wpcf7_enqueue_scripts', 'dnd_cf7_scripts' );
 
-	// Hook language init
-	add_action('plugins_loaded','dnd_load_plugin_textdomain');
+	// Hook on plugins loaded
+	add_action('plugins_loaded','dnd_cf7_upload_plugins_loaded');
 
 	// Ajax Upload
 	add_action( 'wp_ajax_dnd_codedropz_upload', 'dnd_upload_cf7_upload' );
@@ -45,9 +45,47 @@
 	// Add Submenu - Settings
 	add_action('admin_menu', 'dnd_admin_settings');
 
+	// Add custom script in footer
+	add_action('wp_footer','dnd_custom_scripts');
+
+	// Flamingo Hooks
+	add_action('before_delete_post', 'dnd_remove_uploaded_files');
+
 	// Load plugin text-domain
-	function dnd_load_plugin_textdomain() {
+	function dnd_cf7_upload_plugins_loaded() {
+
+		// Load language domain
 		load_plugin_textdomain( 'dnd-upload-cf7', false, dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages' );
+
+		// Create dir
+		$dir = dnd_get_upload_dir();
+		if( is_dir( $dir['upload_dir'] ) ) {
+			// Generate .htaccess file`
+			$htaccess_file = path_join( dirname( $dir['upload_dir'] ), '.htaccess' );
+			if ( ! file_exists( $htaccess_file ) ) {
+				if ( $handle = fopen( $htaccess_file, 'w' ) ) {
+					fwrite( $handle, "Options -Indexes \n <Files *.php> \n deny from all \n </Files>" );
+					fclose( $handle );
+				}
+			}
+		}
+	}
+
+	// Remove uploaded files when item is deleted permanently.
+	function dnd_remove_uploaded_files( $post_id ) {
+		$post_type = get_post_type( $post_id );
+		$page = get_post( $post_id );
+		if( $post_type == 'flamingo_inbound' ) {
+			preg_match_all( '/(.*?)(\/'.wpcf7_dnd_dir.'\/wpcf7-files\/.*$)/m', $page->post_content, $matches );
+			if( $matches[0] && count( $matches[0] ) > 0 ) {
+				foreach( $matches[0] as $files ) {
+					$new_file = str_replace( site_url().'/', wp_normalize_path( ABSPATH ), $files );
+					if( file_exists( $new_file ) ) {
+						wp_delete_file( $new_file );
+					}
+				}
+			}
+		}
 	}
 
 	// Modify contact form posted_data
@@ -70,7 +108,7 @@
 				$field_name = $field->name;
 				if( $field->basetype == 'mfile' && isset( $posted_data[$field_name] ) && ! empty( $posted_data[$field_name] ) ) {
 					foreach( $posted_data[$field_name] as $key => $file ) {
-						$posted_data[$field_name][$key] = trailingslashit( $uploads_dir['upload_url'] ) . basename( $file );
+						$posted_data[$field_name][$key] = trailingslashit( $uploads_dir['upload_url'] ) . wp_basename( $file );
 					}
 				}
 			}
@@ -102,6 +140,8 @@
 			'large_file'		=>	__('Uploaded file is too large','dnd-upload-cf7'),
 			'invalid_type'		=>	__('Uploaded file is not allowed for file type','dnd-upload-cf7'),
 			'max_file_limit'	=>	__('Note : Some of the files are not uploaded ( Only %count% files allowed )','dnd-upload-cf7'),
+			'required'			=>	__('This field is required.', 'dnd-upload-cf7' ),
+			'min_file'			=>	__('Minimum file upload at least','dnd-upload-cf7'),
 		);
 
 		// return error message based on $error_key request
@@ -261,34 +301,47 @@
 			return $components;
 		}
 
-		// If mail_2 is set - Do not send attachment ( unless File Attachment field is not empty )
-		if( ( $mail_2 = $form->prop('mail_2') ) && $mail_2['active'] && empty( $mail_2['attachments'] ) && $_mail >= 1 ) {
-			return $components;
+		// Get mail,mail_2 attachment [tags]
+		$mail = array('mail','mail_2');
+		$props_mail = array();
+
+		foreach( $mail as $single_mail ) {
+			$props_mail[] = $form->prop( $single_mail );
 		}
 
-		// Loop fields get mfile only.
-		foreach( $fields as $field ) {
+		// Get email attachments (mail, mail_2)
+		$mail = $props_mail[ $_mail ];
+		if( $mail['active'] && $mail['attachments'] ) {
 
-			// If field type equal to mfile which our default field.
-			if( $field->basetype == 'mfile') {
+			// Loop fields get mfile only.
+			foreach( $fields as $field ) {
 
-				// Make sure we have files to attach
-				if( isset( $_POST[ $field->name ] ) && count( $_POST[ $field->name ] ) > 0 ) {
+				// If field type equal to mfile which our default field.
+				if( $field->basetype == 'mfile') {
 
-					// Loop all the files and attach to cf7 components
-					foreach( $_POST[ $field->name ] as $_file ) {
+					// Make sure we have files to attach
+					if( isset( $_POST[ $field->name ] ) && count( $_POST[ $field->name ] ) > 0 ) {
 
-						// Join dir and a new file name ( get from <input type="hidden" name="upload-file-333"> )
-						$new_file_name = trailingslashit( $uploads_dir['upload_dir'] ) . basename( $_file );
+						// Check and make sure [upload-file-xxx] exists in attachments - fields
+						if ( false !== strpos( $mail['attachments'], "[{$field->name}]" ) ) {
 
-						// Check if submitted and file exists then file is ready.
-						if ( $submission && file_exists( $new_file_name ) ) {
-							$components['attachments'][] = $new_file_name;
+							// Loop all the files and attach to cf7 components
+							foreach( $_POST[ $field->name ] as $_file ) {
+
+								// Join dir and a new file name ( get from <input type="hidden" name="upload-file-333"> )
+								$new_file_name = trailingslashit( $uploads_dir['upload_dir'] ) . wp_basename( $_file );
+
+								// Check if submitted and file exists then file is ready.
+								if ( $submission && file_exists( $new_file_name )  ) {
+									$components['attachments'][] = $new_file_name;
+								}
+							}
+
 						}
 					}
 				}
-
 			}
+
 		}
 
 		// Increment mail counter
@@ -311,7 +364,8 @@
 		//  registered script with data for a JavaScript variable.
 		wp_localize_script( 'dnd-upload-cf7', 'dnd_cf7_uploader',
 			array(
-				'ajax_url' 				=> admin_url( 'admin-ajax.php' ),
+				'ajax_url' 				=> 	admin_url( 'admin-ajax.php' ),
+				'ajax_nonce'			=>	wp_create_nonce( "dnd-cf7-security-nonce" ),
 				'drag_n_drop_upload' 	=> array(
 					'text'				=>	( get_option('drag_n_drop_text') ? get_option('drag_n_drop_text') : __('Drag & Drop Files Here','dnd-upload-cf7') ),
 					'or_separator'		=>	( get_option('drag_n_drop_separator') ? get_option('drag_n_drop_separator') : __('or','dnd-upload-cf7') ),
@@ -320,6 +374,11 @@
 					'large_file'		=>	( get_option('drag_n_drop_error_files_too_large') ? get_option('drag_n_drop_error_files_too_large') : dnd_cf7_error_msg('large_file') ),
 					'inavalid_type'		=>	( get_option('drag_n_drop_error_invalid_file') ? get_option('drag_n_drop_error_invalid_file') : dnd_cf7_error_msg('invalid_type') ),
 					'max_file_limit'	=>	( get_option('drag_n_drop_error_max_file') ? get_option('drag_n_drop_error_max_file') : dnd_cf7_error_msg('max_file_limit') ),
+					'required'			=>	dnd_cf7_error_msg('required'),
+					'delete'			=>	array(
+						'text'		=>	__('deleting','dnd-upload-cf7'),
+						'title'		=>	__('Remove','dnd-upload-cf7')
+					)
 				)
 			)
 		);
@@ -403,12 +462,29 @@
 	function dnd_upload_cf7_validation_filter( $result, $tag ) {
 		$name = $tag->name;
 		$id = $tag->get_id_option();
+		$multiple_files = ( ( isset( $_POST[ $name ] ) && count( $_POST[ $name ] ) > 0 ) ? $_POST[ $name ] : null );
+		$min_file = $tag->get_option( 'min-file','', true);
 
-		$multiple_files = ( isset( $_POST[ $name ] ) ? $_POST[ $name ] : null );
+		// Cf7 Conditional Field
+		if( in_array('cf7-conditional-fields/contact-form-7-conditional-fields.php', get_option('active_plugins') ) ){
+			$hidden_groups = json_decode( stripslashes( $_POST['_wpcf7cf_hidden_groups'] ) );
+			if( $tag->is_required() && ! in_array( $name, $hidden_groups ) && is_null( $multiple_files ) ) {
+				$result->invalidate( $tag, wpcf7_get_message( 'invalid_required' ) );
+				return $result;
+			}
+			return $result;
+		}
 
 		// Check if we have files or if it's empty
-		if( ( is_null( $multiple_files ) || count( $multiple_files ) == 0 ) && $tag->is_required() ) {
+		if( is_null( $multiple_files ) && $tag->is_required() ) {
 			$result->invalidate( $tag, wpcf7_get_message( 'invalid_required' ) );
+			return $result;
+		}
+
+		// Check minimum upload
+		if( $multiple_files && count( $multiple_files ) < (int) $min_file ) {
+			$min_file_error = ( get_option('drag_n_drop_error_min_file') ? get_option('drag_n_drop_error_min_file') : dnd_cf7_error_msg('min_file') );
+			$result->invalidate( $tag, $min_file_error .' '. (int)$min_file );
 			return $result;
 		}
 
@@ -464,6 +540,10 @@
 							<td><input type="text" name="filetypes" class="filetype oneline option" placeholder="jpeg|png|jpg|gif" id="<?php echo esc_attr( $args['content'] . '-filetypes' ); ?>" /></td>
 						</tr>
 						<tr>
+							<th scope="row"><label for="<?php echo esc_attr( $args['content'] . '-min-file' ); ?>"><?php echo esc_html( __( 'Mininum file upload', 'contact-form-7' ) ); ?></label></th>
+							<td><input type="text" name="min-file" class="filetype oneline option" placeholder="5" id="<?php echo esc_attr( $args['content'] . '-min-file' ); ?>" /></td>
+						</tr>
+						<tr>
 							<th scope="row"><label for="<?php echo esc_attr( $args['content'] . '-max-file' ); ?>"><?php echo esc_html( __( 'Max file upload', 'contact-form-7' ) ); ?></label></th>
 							<td><input type="text" name="max-file" class="filetype oneline option" placeholder="10" id="<?php echo esc_attr( $args['content'] . '-max-file' ); ?>" /></td>
 						</tr>
@@ -497,24 +577,35 @@
 	// Begin process upload
 	function dnd_upload_cf7_upload() {
 
+		// check and verify ajax request
+		if( is_user_logged_in() ) {
+			check_ajax_referer( 'dnd-cf7-security-nonce', 'security' );
+		}
+
 		// Get upload dir
 		$path = dnd_get_upload_dir();
 
 		// input type file 'name'
 		$name = 'upload-file';
 
+		// Get File ( name, type, tmp_name, size, error )
 		$file = isset( $_FILES[$name] ) ? $_FILES[$name] : null;
 
 		// Tells whether the file was uploaded via HTTP POST
 		if ( ! is_uploaded_file( $file['tmp_name'] ) ) {
-			wp_send_json_error( get_option('drag_n_drop_error_failed_to_upload') ? get_option('drag_n_drop_error_failed_to_upload') : dnd_cf7_error_msg('failed_upload') );
+			$failed_error = get_option('drag_n_drop_error_failed_to_upload');
+			wp_send_json_error( '('. $file['error'] .') ' . ( $failed_error ? $failed_error : dnd_cf7_error_msg('failed_upload') ) );
 		}
 
 		/* File type validation */
-		$file_type_pattern = dnd_upload_cf7_filetypes( $_POST['supported_type'] );
+		$supported_type = preg_replace( '/[^a-zA-Z0-9|\']/', '', sanitize_text_field($_POST['supported_type']) );
+		$file_type_pattern = dnd_upload_cf7_filetypes( $supported_type );
+
+		// Get file extension
+		$extension = strtolower( pathinfo( $file['name'], PATHINFO_EXTENSION ) );
 
 		// validate file type
-		if ( ! preg_match( $file_type_pattern, $file['name'] ) ) {
+		if ( ! preg_match( $file_type_pattern, $file['name'] ) || ! dnd_cf7_validate_type( $extension, $supported_type ) ) {
 			wp_send_json_error( get_option('drag_n_drop_error_invalid_file') ? get_option('drag_n_drop_error_invalid_file') : dnd_cf7_error_msg('invalid_type') );
 		}
 
@@ -524,9 +615,12 @@
 		}
 
 		// Create file name
-		$filename = $file['name'];
+		$filename = wp_basename( $file['name'] );
 		$filename = wpcf7_canonicalize( $filename, 'as-is' );
-		$filename = wpcf7_antiscript_file_name( $filename );
+
+		if( mb_check_encoding( $filename, 'ASCII' ) ){
+			$filename = wpcf7_antiscript_file_name( $filename );
+		}
 
 		// Add filter on upload file name
 		$filename = apply_filters( 'wpcf7_upload_file_name', $filename,	$file['name'] );
@@ -537,12 +631,13 @@
 
 		// Upload File
 		if ( false === move_uploaded_file( $file['tmp_name'], $new_file ) ) {
-			wp_send_json_error( get_option('drag_n_drop_error_failed_to_upload') ? get_option('drag_n_drop_error_failed_to_upload') : dnd_cf7_error_msg('failed_upload') );
+			$failed_error = get_option('drag_n_drop_error_failed_to_upload');
+			wp_send_json_error( '('. $file['error'] .') ' . ( $failed_error ? $failed_error : dnd_cf7_error_msg('failed_upload') ) );
 		}else{
 
 			$files = array(
 				'path'	=>	basename( $path['upload_dir'] ),
-				'file'	=>	str_replace('/','-', $filename )
+				'file'	=>	str_replace('/','-', $filename)
 			);
 
 			// Change file permission to 0400
@@ -557,15 +652,39 @@
 	// Delete file
 	function dnd_codedropz_upload_delete() {
 
-		// Get upload dir
-		$upload_dir = dnd_get_upload_dir();
+		// check and verify ajax request
+		if( is_user_logged_in() ) {
+			check_ajax_referer( 'dnd-cf7-security-nonce', 'security' );
+		}
+
+		// Sanitize Path
+		$path = ( isset( $_POST['path'] ) ? sanitize_text_field( $_POST['path'] ) : null );
+
+		// Get folder directory
+		$dir = dnd_get_upload_dir();
 
 		// Make sure path is set
-		if( isset( $_POST['path'] ) && ! empty( $_POST['path'] ) ) {
-			$file_path = trailingslashit( dirname( $upload_dir['upload_dir'] ) ) . trim( $_POST['path'] );
+		if( ! is_null( $path ) ) {
+
+			// Check valid filename & extensions
+			if( preg_match_all('/wp-|(\.php|\.exe|\.js|\.phtml|\.cgi|\.aspx|\.asp|\.bat)/', $path ) ) {
+				die('File not safe');
+			}
+
+			// Concatenate path and upload directory
+			$file_path = realpath( trailingslashit( dirname( $dir['upload_dir'] ) ) . trim( $path ) );
+
+			// Check if is in the correct upload_dir
+			if( ! preg_match("/". wpcf7_dnd_dir ."/i", $file_path ) ) {
+				die('It\'s not a valid upload directory');
+			}
+
+			// Check if file exists
 			if( file_exists( $file_path ) ){
 				wp_delete_file( $file_path );
-				wp_send_json_success( 'true' );
+				if( ! file_exists( $file_path ) ) {
+					wp_send_json_success('File Deleted!');
+				}
 			}
 		}
 
@@ -599,6 +718,33 @@
 		}
 
 		return $file_type_pattern;
+	}
+
+	// Add more validation for file extension
+	function dnd_cf7_validate_type( $extension, $supported_types ) {
+		$valid = true;
+		$extension = preg_replace( '/[^A-Za-z0-9,|]/', '', $extension );
+
+		// not allowed file types
+		$not_allowed = array( 'php', 'php3','php4','phtml','exe','script', 'app', 'asp', 'bas', 'bat', 'cer', 'cgi', 'chm', 'cmd', 'com', 'cpl', 'crt', 'csh', 'csr', 'dll', 'drv', 'fxp', 'flv', 'hlp', 'hta', 'htaccess', 'htm', 'htpasswd', 'inf', 'ins', 'isp', 'jar', 'js', 'jse', 'jsp', 'ksh', 'lnk', 'mdb', 'mde', 'mdt', 'mdw', 'msc', 'msi', 'msp', 'mst', 'ops', 'pcd', 'php', 'pif', 'pl', 'prg', 'ps1', 'ps2', 'py', 'rb', 'reg', 'scr', 'sct', 'sh', 'shb', 'shs', 'sys', 'swf', 'tmp', 'torrent', 'url', 'vb', 'vbe', 'vbs', 'vbscript', 'wsc', 'wsf', 'wsf', 'wsh' );
+
+		// Search in $not_allowed extension and match
+		foreach( $not_allowed as $single_ext ) {
+			if ( strpos( $single_ext, $extension ) !== false ) {
+				$valid = false;
+				break;
+			}
+		}
+
+		// If pass on first validation - check extension if exists in allowed types
+		if( $valid === true ) {
+			$extensions = explode('|', strtolower( $supported_types ) );
+			if( ! in_array( $extension, $extensions ) ) {
+				$valid = false;
+			}
+		}
+
+		return $valid;
 	}
 
 	// Admin Settings
@@ -665,6 +811,10 @@
 						<th scope="row"><?php _e('Max File Limit','dnd-upload-cf7'); ?></th>
 						<td><input type="text" name="drag_n_drop_error_max_file" class="regular-text" value="<?php echo esc_attr( get_option('drag_n_drop_error_max_file') ); ?>" placeholder="" /><p class="description">Example: `Note : Some of the files are not uploaded ( Only %count% files allowed )`</p></td>
 					</tr>
+					<tr valign="top">
+						<th scope="row"><?php _e('Mininimum File','dnd-upload-cf7'); ?></th>
+						<td><input type="text" name="drag_n_drop_error_min_file" placeholder="" class="regular-text" value="<?php echo esc_attr( get_option('drag_n_drop_error_min_file') ); ?>" placeholder="" /></td>
+					</tr>
 				</table>
 
 				<?php submit_button(); ?>
@@ -672,6 +822,41 @@
 		<?php
 			echo '</form>';
 		echo '</div>';
+	}
+
+	// Add script in footer
+	function dnd_custom_scripts() {
+		if( ! in_array('jquery-validation-for-contact-form-7/jquery-validation-for-contact-form-7.php', get_option('active_plugins') ) ){
+			return;
+		}
+		?>
+		<script type="text/javascript">
+			// Contact form 7 - Jquery validation
+			jQuery(document).ready(function($){
+				jQuery('.wpcf7-form-control.wpcf7-submit').click(function(e){
+					var uploadFields = $(this).parents('form').find('.wpcf7-drag-n-drop-file');
+					var valid = true;
+					if( uploadFields.length > 0 ) {
+						jQuery.each(uploadFields, function(i,field){
+							if( $(field).attr('aria-required') == 'true' ) {
+								parentsWrap = $(field).parents('.codedropz-upload-wrapper');
+								parentsWrap.removeClass('invalid');
+								parentsWrap.find('label').remove();
+								if( $('[type="hidden"][name="'+$(field).attr('data-name')+'[]"]').length == 0 ) {
+									parentsWrap.append('<label class="error-new">'+ dnd_cf7_uploader.drag_n_drop_upload.required +'</label>').addClass('invalid');
+									valid = false;
+								}
+							}
+						});
+						if( ! valid ) {
+							return false;
+						}
+					}
+					return true;
+				});
+			});
+		</script>
+		<?php
 	}
 
 	// Add custom links
@@ -694,4 +879,5 @@
 		register_setting( 'drag-n-drop-upload-file-cf7', 'drag_n_drop_error_files_too_large','sanitize_text_field' );
 		register_setting( 'drag-n-drop-upload-file-cf7', 'drag_n_drop_error_invalid_file','sanitize_text_field' );
 		register_setting( 'drag-n-drop-upload-file-cf7', 'drag_n_drop_error_max_file','sanitize_text_field' );
+		register_setting( 'drag-n-drop-upload-file-cf7', 'drag_n_drop_error_min_file','sanitize_text_field' );
 	}

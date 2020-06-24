@@ -348,6 +348,39 @@ class CF7CF {
         return is_array($options) ? $options : array(); // the meta key 'wpcf7cf_options' is a bit misleading at this point, because it only holds the form's conditions, no other options/settings
     }
 
+    /**
+     * load the conditions from the form's post_meta as plain text
+     *
+     * @param string $form_id
+     * @return void
+     */
+    public static function getConditionsPlainText($form_id) {
+        return CF7CF::serializeConditions(CF7CF::getConditions($form_id));
+    }
+
+    public static function serializeConditions($array) {
+
+        $lines = [];
+
+        foreach ($array as $entry) {
+            $then_field = $entry['then_field'];
+            $and_rules = $entry['and_rules'];
+            $indent = strlen($then_field) + 4;
+            foreach ($and_rules as $i => $rule) {
+                $if_field = $rule['if_field'];
+                $operator = $rule['operator'];
+                $if_value = $rule['if_value'];
+
+                if ($i == 0) {
+                    $lines[] = "show [${then_field}] if [${if_field}] ${operator} \"${if_value}\"";
+                } else {
+                    $lines[] = str_repeat(' ',$indent)."and if [${if_field}] ${operator} \"${if_value}\"";
+                }
+            }
+        }
+        
+        return implode("\n", $lines);
+    }
     
     /**
      * save the conditions to the form's post_meta
@@ -417,7 +450,7 @@ function wpcf7cf_form_hidden_fields($hidden_fields) {
     $options = array(
         'form_id' => $current_form_id,
         'conditions' => CF7CF::getConditions($current_form_id),
-        'settings' => get_option(WPCF7CF_OPTIONS)
+        'settings' => wpcf7cf_get_settings()
     );
 
     unset($options['settings']['license_key']); // don't show license key in the source code duh.

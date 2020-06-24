@@ -1,15 +1,19 @@
 <?php get_header(); ?>
 
-    <main id="main" class="content" role="main" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
+<?php while(have_posts()) : the_post(); ?>
+
+    <header id="header" class="header patOrHor" role="banner" itemscope="itemscope" itemtype="http://schema.org/Organization">
+    	<div class="row-pad">
+        	<h1 itemprop="headline" class="plain"><?php the_title(); ?></h1>
+        </div>
+    </header>
+
+
+    <main id="main" class="content singleContent" role="main" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="http://schema.org/Blog">
 		<div class="row-pad">
-    
-        <?php while(have_posts()) : the_post(); ?>
     
     
             <article class="article" id="<?php the_ID(); ?>" <?php post_class(); ?>  itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
-                <div class="article-meta">
-                	<h1 itemprop="headline"><?php the_title(); ?></h1>	
-                </div><!-- .entry-meta -->
                 <div class="article-content" itemprop="text">
                     <?php the_content(); ?>
                 </div>
@@ -18,9 +22,9 @@
             </article> <!-- .article -->
 
             
-        <?php endwhile; ?>
         
 		</div>
     </main>
+<?php endwhile; ?>
 
 <?php get_footer(); ?>
