@@ -1,13 +1,9 @@
 <?php
-/**
- * Yoast model class.
- *
- * @package Yoast\WP\Lib
- */
 
 namespace Yoast\WP\Lib;
 
 use JsonSerializable;
+use ReturnTypeWillChange;
 
 /**
  * Make Model compatible with WordPress.
@@ -42,7 +38,7 @@ class Model implements JsonSerializable {
 	 * @example Model::$auto_prefix_models = 'MyProject_MyModels_'; //PEAR
 	 * @example Model::$auto_prefix_models = '\MyProject\MyModels\'; //Namespaces
 	 *
-	 * @var string $auto_prefix_models
+	 * @var string
 	 */
 	public static $auto_prefix_models = '\Yoast\WP\SEO\Models\\';
 
@@ -53,14 +49,14 @@ class Model implements JsonSerializable {
 	 * @example Model::$short_table_names = true;
 	 * @example Model::$short_table_names = false; // default
 	 *
-	 * @var bool $short_table_names
+	 * @var bool
 	 */
 	public static $short_table_names = false;
 
 	/**
 	 * The ORM instance used by this model instance to communicate with the database.
 	 *
-	 * @var ORM $orm
+	 * @var ORM
 	 */
 	public $orm;
 
@@ -91,6 +87,13 @@ class Model implements JsonSerializable {
 	 * @var array
 	 */
 	protected $int_columns = [];
+
+	/**
+	 * Which columns contain float values.
+	 *
+	 * @var array
+	 */
+	protected $float_columns = [];
 
 	/**
 	 * Hacks around the Model to provide WordPress prefix to tables.
@@ -159,20 +162,22 @@ class Model implements JsonSerializable {
 	 * class or the property does not exist, returns the default
 	 * value supplied as the third argument (which defaults to null).
 	 *
-	 * @param string      $class_name The target class name.
-	 * @param string      $property   The property to get the value for.
-	 * @param null|string $default    Default value when property does not exist.
+	 * @param string     $class_name    The target class name.
+	 * @param string     $property      The property to get the value for.
+	 * @param mixed|null $default_value Default value when property does not exist.
 	 *
-	 * @return string The value of the property.
+	 * @return mixed|null The value of the property.
 	 */
-	protected static function get_static_property( $class_name, $property, $default = null ) {
+	protected static function get_static_property( $class_name, $property, $default_value = null ) {
 		if ( ! \class_exists( $class_name ) || ! \property_exists( $class_name, $property ) ) {
-			return $default;
+			return $default_value;
 		}
 
-		$properties = \get_class_vars( $class_name );
+		if ( ! isset( $class_name::${$property} ) ) {
+			return $default_value;
+		}
 
-		return $properties[ $property ];
+		return $class_name::${$property};
 	}
 
 	/**
@@ -255,6 +260,7 @@ class Model implements JsonSerializable {
 
 		$class_name = \ltrim( $class_name, '\\' );
 		$class_name = \preg_replace( $find, $replacements, $class_name );
+
 		return \strtolower( $class_name );
 	}
 
@@ -305,7 +311,7 @@ class Model implements JsonSerializable {
 	public static function factory( $class_name ) {
 		$class_name = static::$auto_prefix_models . $class_name;
 		$table_name = static::get_table_name_for_class( $class_name );
-		$wrapper = ORM::for_table( $table_name );
+		$wrapper    = ORM::for_table( $table_name );
 		$wrapper->set_class_name( $class_name );
 		$wrapper->use_id_column( static::get_id_column_name( $class_name ) );
 
@@ -319,10 +325,11 @@ class Model implements JsonSerializable {
 	 * the method chain.
 	 *
 	 * @param string      $associated_class_name                    The associated class name.
-	 * @param null|string $foreign_key_name                         The foreign key name in the associated table.
-	 * @param null|string $foreign_key_name_in_current_models_table The foreign key in the current models table.
+	 * @param string|null $foreign_key_name                         The foreign key name in the associated table.
+	 * @param string|null $foreign_key_name_in_current_models_table The foreign key in the current models table.
 	 *
-	 * @return ORM
+	 * @return ORM Instance of the ORM.
+	 *
 	 * @throws \Exception When ID of current model has a null value.
 	 */
 	protected function has_one_or_many( $associated_class_name, $foreign_key_name = null, $foreign_key_name_in_current_models_table = null ) {
@@ -350,10 +357,11 @@ class Model implements JsonSerializable {
 	 * key is on the associated table.
 	 *
 	 * @param string      $associated_class_name                    The associated class name.
-	 * @param null|string $foreign_key_name                         The foreign key name in the associated table.
-	 * @param null|string $foreign_key_name_in_current_models_table The foreign key in the current models table.
+	 * @param string|null $foreign_key_name                         The foreign key name in the associated table.
+	 * @param string|null $foreign_key_name_in_current_models_table The foreign key in the current models table.
 	 *
 	 * @return ORM Instance of the ORM.
+	 *
 	 * @throws \Exception  When ID of current model has a null value.
 	 */
 	protected function has_one( $associated_class_name, $foreign_key_name = null, $foreign_key_name_in_current_models_table = null ) {
@@ -365,10 +373,11 @@ class Model implements JsonSerializable {
 	 * key is on the associated table.
 	 *
 	 * @param string      $associated_class_name                    The associated class name.
-	 * @param null|string $foreign_key_name                         The foreign key name in the associated table.
-	 * @param null|string $foreign_key_name_in_current_models_table The foreign key in the current models table.
+	 * @param string|null $foreign_key_name                         The foreign key name in the associated table.
+	 * @param string|null $foreign_key_name_in_current_models_table The foreign key in the current models table.
 	 *
 	 * @return ORM Instance of the ORM.
+	 *
 	 * @throws \Exception When ID has a null value.
 	 */
 	protected function has_many( $associated_class_name, $foreign_key_name = null, $foreign_key_name_in_current_models_table = null ) {
@@ -382,8 +391,8 @@ class Model implements JsonSerializable {
 	 * the foreign key is on the base table.
 	 *
 	 * @param string      $associated_class_name                       The associated class name.
-	 * @param null|string $foreign_key_name                            The foreign key in the current models table.
-	 * @param null|string $foreign_key_name_in_associated_models_table The foreign key in the associated table.
+	 * @param string|null $foreign_key_name                            The foreign key in the current models table.
+	 * @param string|null $foreign_key_name_in_associated_models_table The foreign key in the associated table.
 	 *
 	 * @return $this|null Instance of the foreign model.
 	 */
@@ -404,7 +413,8 @@ class Model implements JsonSerializable {
 		}
 
 		// Comparison: "{$associated_table_name}.{$foreign_key_name_in_associated_models_table} = {$associated_object_id}".
-		return static::factory( $associated_class_name )->where( $foreign_key_name_in_associated_models_table, $associated_object_id );
+		return static::factory( $associated_class_name )
+			->where( $foreign_key_name_in_associated_models_table, $associated_object_id );
 	}
 
 	/**
@@ -412,11 +422,11 @@ class Model implements JsonSerializable {
 	 * README for a full explanation of the parameters.
 	 *
 	 * @param string      $associated_class_name   The associated class name.
-	 * @param null|string $join_class_name         The class name to join.
-	 * @param null|string $key_to_base_table       The key to the the current models table.
-	 * @param null|string $key_to_associated_table The key to the associated table.
-	 * @param null|string $key_in_base_table       The key in the current models table.
-	 * @param null|string $key_in_associated_table The key in the associated table.
+	 * @param string|null $join_class_name         The class name to join.
+	 * @param string|null $key_to_base_table       The key to the the current models table.
+	 * @param string|null $key_to_associated_table The key to the associated table.
+	 * @param string|null $key_in_base_table       The key in the current models table.
+	 * @param string|null $key_in_associated_table The key in the associated table.
 	 *
 	 * @return ORM Instance of the ORM.
 	 */
@@ -458,12 +468,13 @@ class Model implements JsonSerializable {
 		$key_to_base_table       = static::build_foreign_key_name( $key_to_base_table, $base_table_name );
 		$key_to_associated_table = static::build_foreign_key_name( $key_to_associated_table, $associated_table_name );
 
-		/*
+		/* phpcs:ignore Squiz.PHP.CommentedOutCode.Found -- Reason: This is commented out code.
 			"   SELECT {$associated_table_name}.*
 				FROM {$associated_table_name} JOIN {$join_table_name}
 					ON {$associated_table_name}.{$associated_table_id_column} = {$join_table_name}.{$key_to_associated_table}
 				WHERE {$join_table_name}.{$key_to_base_table} = {$this->$base_table_id_column} ;"
 		*/
+
 		return static::factory( $associated_class_name )
 			->select( "{$associated_table_name}.*" )
 			->join(
@@ -493,7 +504,7 @@ class Model implements JsonSerializable {
 	 *
 	 * @param string $property The property to get.
 	 *
-	 * @return null|string The value of the property
+	 * @return mixed The value of the property
 	 */
 	public function __get( $property ) {
 		$value = $this->orm->get( $property );
@@ -503,6 +514,9 @@ class Model implements JsonSerializable {
 		}
 		if ( $value !== null && \in_array( $property, $this->int_columns, true ) ) {
 			return (int) $value;
+		}
+		if ( $value !== null && \in_array( $property, $this->float_columns, true ) ) {
+			return (float) $value;
 		}
 
 		return $value;
@@ -521,6 +535,9 @@ class Model implements JsonSerializable {
 			$value = ( $value ) ? '1' : '0';
 		}
 		if ( $value !== null && \in_array( $property, $this->int_columns, true ) ) {
+			$value = (string) $value;
+		}
+		if ( $value !== null && \in_array( $property, $this->float_columns, true ) ) {
 			$value = (string) $value;
 		}
 
@@ -543,6 +560,7 @@ class Model implements JsonSerializable {
 	 *
 	 * @return array The data of this object.
 	 */
+	#[ReturnTypeWillChange]
 	public function jsonSerialize() {
 		return $this->orm->as_array();
 	}
@@ -640,7 +658,7 @@ class Model implements JsonSerializable {
 	/**
 	 * Save the data associated with this model instance to the database.
 	 *
-	 * @return null Nothing.
+	 * @return bool True on success.
 	 */
 	public function save() {
 		if ( $this->uses_timestamps ) {
@@ -656,7 +674,7 @@ class Model implements JsonSerializable {
 	/**
 	 * Delete the database row associated with this model instance.
 	 *
-	 * @return null Nothing.
+	 * @return bool|int Response of wpdb::query.
 	 */
 	public function delete() {
 		return $this->orm->delete();
@@ -666,6 +684,7 @@ class Model implements JsonSerializable {
 	 * Get the database ID of this model instance.
 	 *
 	 * @return int The database ID of the models instance.
+	 *
 	 * @throws \Exception When the ID is a null value.
 	 */
 	public function id() {

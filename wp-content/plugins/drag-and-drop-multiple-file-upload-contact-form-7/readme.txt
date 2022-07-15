@@ -1,9 +1,10 @@
 === Drag and Drop Multiple File Upload - Contact Form 7 ===
+Contributors: glenwpcoder, yordansoares
 Donate link : http://codedropz.com/donation
 Tags: drag and drop, contact form 7, ajax uploader, multiple file, upload, contact form 7 uploader
 Requires at least: 3.0.1
-Tested up to: 5.4.1
-Stable tag: 1.3.5.1
+Tested up to: 6.0
+Stable tag: 1.3.6.4
 Requires PHP: 5.2.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -26,36 +27,52 @@ Here's a little [DEMO](http://codedropz.com/contact).
 * Drag & Drop or Browse File - Multiple Upload
 * Support Multiple Drag and Drop in One Form.
 * Able to delete uploaded file before being sent
-* Send files as email attachment or as a links.
+* Send files as **email attachment** or as a **links**. *(see note below)*
 * Support multiple languages
 * Mobile Responsive
 * Cool Progress Bar
 * Compatible with any browser
 
-### Premium Features
+**Note:** On Free version, all uploaded files moves to a temporary folder *("/wp-content/uploads/wp_dndcf7_uploads")* then attaches the file to the mail and sends it. After that **"Drag & Drop File Upload"** removes the file from the temporary folder **1 hour** after the submission. *( same process with the default **"file"** upload of Contact Form 7 - [See here](https://contactform7.com/file-uploading-and-attachment/#How-your-uploaded-files-are-managed) )*
+
+### ⭐ Premium Features
 
 Checkout available features on **PRO version**.
 
 * Image Preview - Show Thumbnail for images
-* Auto Delete Files - After Form Submission 
+* Adjust Auto Delete Files - After Form Submission
   - *(1 hour, 4 hours, 8 hours , days, months etc)*
 * Zip Files ( Compressed File )
 * Save Files to Wordpress Media Library
-* Change Upload Directory
+* Change Wordpress Upload Directory
+* Change Upload Folder
+  - Contact Form 7 - Fields
   - Generated Name - Timestamp
   - Random Folder
-  - By User
-  - Custom Folder 
+  - By User - Required Login
+  - Custom Folder
+  - Dynamic Folder - *user (name, id), post (id, slug), cf7 fields*
 * Send to email as individual attachment, ZIP archive or as a links
 * Chunks Upload *( Break large files into smaller Chunks )*
+  - Able to upload large files.
 * Max Total Size *( of all Uploaded Files )*
-* Parallel/Sequential Upload *( Number of files to simultaneously upload )*
-* Change Filename Pattern ({filename}, {ip_address}, {random}, {post_id}, {post_slug}, etc.)
+* Parallel/Sequential Upload *( No. of files to simultaneously upload )*
+* Change **Filename Pattern** ({filename}, {cf7-field-name}, {ip_address}, {random}, {post_id}, {post_slug}, etc.)
 * Automatically Optimize Images
-* Able to Resize/Crop image (ie: 800x800)
+* **New** - Color Options (Filesize, ProgressBar, Filename etc)
+* **New** - Disable Button to Prevent Duplicate Submission
+* **New** - Image preview on email
+* **New** - File Remote Storage (Google Drive, Amazon S3, FTP, Dropbox)
+* Resize Image (ie: 800x800)
 * Improved Security
 * Optimized Code and Performance
 * 1 Month Premium Support
+
+**Pro version** is also compatible with:
+
+* Contact Form 7 Add-on – Arshid
+* Database for Contact Form 7- Ninja
+* Advanced Contact form 7 DB – Vsourz Digital
 
 You can get [PRO Version here](https://www.codedropz.com/purchase-plugin/)!
 
@@ -63,6 +80,16 @@ You can get [PRO Version here](https://www.codedropz.com/purchase-plugin/)!
 
 * [Drag & Drop Multiple File Upload - WPForms](https://www.codedropz.com/drag-drop-file-uploader-wpforms/)
 An extension for **WPForms** - Transform your simple file upload into beautiful **"Drag & Drop Multiple File Upload"**.
+
+* [Drag & Drop Multiple File Upload - WooCommerce](https://wordpress.org/plugins/drag-and-drop-multiple-file-upload-for-woocommerce/)
+An extension for **WooCommerce** - Transform your simple file upload into beautiful **"Drag & Drop Multiple File Upload"**.
+
+* [WooCommerce Memberships](https://www.codedropz.com/woocommerce-memberships/)
+An extension for **WooCommerce** - WooCommerce Memberships is not just another plugin for restricting your site’s content: it’s an easy-to-use, site-wide membership solution that brings your content, shop, and memberships together.
+
+**PLUGIN GUIDE - FREE VERSION**
+
+[youtube https://www.youtube.com/watch?v=DvuvmzIImYo]
 
 == Frequently Asked Questions ==
 
@@ -73,6 +100,10 @@ For any bug reports go to <a href="https://wordpress.org/support/plugin/drag-and
 = How can I limit file size? =
 
 To limit file size in `multiple file upload` field generator under Contact Form 7, there's a field `File size limit (bytes)`.
+
+You can also manually add limit parameter in existing [mfile] tag.
+
+Example: *[mfile upload-file-433 limit:20971520]* - This limit the user to upload upto 20MB only.
 
 Please take note it should be `Bytes` you may use any converter just Google (MB to Bytes converter) default of this plugin is 5MB(5242880 Bytes).
 
@@ -112,6 +143,8 @@ To install this plugin see below:
 
 1. Upload the plugin files to the `/wp-content/plugins/drag-and-drop-multiple-file-upload-contact-form-7.zip` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress
+3. Go to "Contact > Drag & Drop Upload" for the settings.
+4. See [Tutorial](https://www.youtube.com/watch?v=DvuvmzIImYo)
 
 == Screenshots ==
 
@@ -124,6 +157,68 @@ To install this plugin see below:
 
 == Changelog ==
 
+= 1.3.6.4 =
+- Tested on latest version of wordpress 6.0.
+- Added Compatibility on Contact Form 7 version 5.6.
+
+= 1.3.6.3 =
+- Fixed - Security issues (Cross-Site Scripting through SVG files via remote upload)
+- New - Filter `dnd_cf7_data_options` to manualy change the browse text and label text.
+
+= 1.3.6.2 =
+- Added - Add settings link in the plugin page
+- Fixed - Long text/heading is hidden on the container
+- Fixed - Min file validation
+- Bug - Removed "accept" data attributes in mobile devices
+
+= 1.3.6.1 =
+- Fixed - Unable to delete if errors will show
+- Added “span” & “div” on heading tag option
+- Add spam filtering fixes
+- Added “Disable Auto Delete” option.
+
+= 1.3.5.9 =
+- Add accept types data attributes [See Here](https://wordpress.org/support/topic/the-user-sees-only-a-certain-type-of-files/)
+
+= 1.3.5.8 =
+- Fixed German translation (https://wordpress.org/support/topic/german-translation-wrong/)
+- Fixes - Bug on file deletion (Reported here - https://wordpress.org/support/topic/deleting-files-not-yet-uploaded-is-breaking/)
+- Change delete icon instead of using an iconmoon.
+- Minor fixes & Improvement
+
+= 1.3.5.7 =
+   - Bug - Fixed validation issue when "CF7 Conditional Fields" plugin is active.
+
+= 1.3.5.6 =
+   - New - option to change upload heading tag from h1-h6
+   - Change text-domain to actual plugin slug for plugin internationalization.
+   - Fixed validation error message for multiple groups. (compatible with CF7 - Conditional Fields)
+
+= 1.3.5.5.1 =
+* Bug - Fixed Contact Form 7 error notice
+   - PHP Deprecated: id property of a WPCF7_ContactForm object is no longer accessible.
+   - Reported here - https://wordpress.org/support/topic/bug-notice-id-not-accessible
+
+= 1.3.5.5 =
+* Fixed - Vulnerability (Thanks to @Sysdream Labs team )
+   - Removed "supported type" in POST request so other users cannot override through remote access.
+   - The issue was, user able to bypass and upload ".phar & .phpt" file extension by modifying "suported type"
+   - Those extensions are enabled by default on a fresh PHP/Apache2 installation.
+* Improved - Security (file types condition are based on specified in the admin)
+
+= 1.3.5.4 =
+* Added - Russian translation (Thanks to "Dan Uchvatoff ")
+* Fixed - File counter "of" not translatable.
+
+= 1.3.5.3 =
+* Fixed - PHP Fatal error on server not supporting mb_check_encoding.
+* Fixed - Fatal error: Uncaught Error: Call to a member function scan_form_tags()
+  - When "Accept PayPal Payments using Contact Form 7" installed.
+
+= 1.3.5.2 =
+* Added - Improved sercurity ( Limit the user input to a file name and ignore injected path names )
+* Modified - Email links ( display only the filename )
+
 = 1.3.5.1 =
 * Bug - Quick Fix ( Unable to submit form when acceptance field is set  )
    - Issue if "additional settings" section added  this line: acceptance_as_validation: on
@@ -135,7 +230,7 @@ To install this plugin see below:
 * Modified - File Upload error message  ( display error code )
 
 = 1.3.4 =
-* Fixed - Removed uploaded files when item Inbound Messages "Permanently Deleted". 
+* Fixed - Removed uploaded files when item Inbound Messages "Permanently Deleted".
 * Added -  Counter of how many files are uploaded ( ie: 4 of 10 )
 * New - Features allow to set Minimum File Upload.
 - ie : minimum upload:2, max upload:10 = [mfile* upload-file-669 min-file:2 max-file:10]
@@ -193,7 +288,7 @@ To install this plugin see below:
 
 = 1.2.6.0 =
 * Fixed - Allow to upload file with the same filename.
-* Fixed - Can't upload image after delecting (https://wordpress.org/support/topic/cant-upload-image-after-deleting-it/)
+* Fixed - Can't upload image after deleting (https://wordpress.org/support/topic/cant-upload-image-after-deleting-it/)
 * Fixed - Max-file issue (https://wordpress.org/support/topic/max-file-issue/)
 * Added - a note message when file reached the max-file Limit ( "To inform user that some of the files are not uploaded" ).
 * Added - Better Ajax deletion ( Remove files from the server - Only if `Send As Attachment` is checked )
@@ -256,7 +351,7 @@ This version fixed minor issues/bugs and add multiple drag and drop fields in a 
 This version fixed minor issues and bugs.
 
 = 1.2.2 =
-Added some usefull features.
+Added some useful features.
 
 = 1.2.4 =
 Added new features and fixes.

@@ -5,9 +5,9 @@ namespace Yoast\WP\ACF\Tests;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;
-use Yoast_ACF_Analysis_Requirements;
-use Yoast\WP\ACF\Tests\Doubles\Passing_Dependency;
 use Yoast\WP\ACF\Tests\Doubles\Failing_Dependency;
+use Yoast\WP\ACF\Tests\Doubles\Passing_Dependency;
+use Yoast_ACF_Analysis_Requirements;
 
 /**
  * Class Requirements_Test.

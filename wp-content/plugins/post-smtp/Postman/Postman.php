@@ -23,9 +23,9 @@ class Postman {
 	const MANAGE_POSTMAN_CAPABILITY_LOGS = 'manage_postman_logs';
 
 	/**
-	 * Use the text domain directly instead of this constant, as it 
+	 * Use the text domain directly instead of this constant, as it
 	 * causes issues with https://translate.wordpress.org.
-	 * 
+	 *
 	 * @deprecated
 	 * @see https://github.com/yehudah/Post-SMTP/issues/1#issuecomment-421940923
 	 */
@@ -63,15 +63,14 @@ class Postman {
 		require_once 'Postman-Mail/PostmanMandrillTransport.php';
 		require_once 'Postman-Mail/PostmanSendGridTransport.php';
 		require_once 'Postman-Mail/PostmanMailgunTransport.php';
-		require_once 'PostmanOAuthToken.php';
+        require_once 'Postman-Mail/PostmanSendinblueTransport.php';
+        require_once 'PostmanOAuthToken.php';
 		require_once 'PostmanWpMailBinder.php';
 		require_once 'PostmanConfigTextHelper.php';
 		require_once 'Postman-Email-Log/PostmanEmailLogPostType.php';
 		require_once 'Postman-Mail/PostmanMyMailConnector.php';
 		require_once 'Postman-Mail/PostmanContactForm7.php';
 		require_once 'Phpmailer/PostsmtpMailer.php';
-        require_once 'Extensions/License/PostmanLicenseManager.php';
-        require_once 'Extensions/Admin/PostmanAdmin.php';
 		//require_once 'Postman-Mail/PostmanWooCommerce.php';
 
 		// get plugin metadata - alternative to get_plugin_data
@@ -97,7 +96,6 @@ class Postman {
 		}
 
 		// register the email transports
-		$this->registerTransports( $rootPluginFilenameAndPath );
 
         // store an instance of the WpMailBinder
         $this->wpMailBinder = PostmanWpMailBinder::getInstance();
@@ -147,17 +145,7 @@ class Postman {
 				'on_plugins_loaded',
 		) );
 
-		/**
-		 * @todo: WPML say they fix the issue in version 3.9
-		 * https://wordpress.org/support/topic/error-in-pluggable-php173/#post-10021301
-		 */
-		if ( get_option( 'icl_sitepress_version' ) && version_compare( get_option( 'icl_sitepress_version' ), '3.9', '<' ) ) {
-
-			$active_plugins = (array)get_option('active_plugins', array());
-			if (in_array('sitepress-multilingual-cms/sitepress.php', $active_plugins) && !get_option('postman_wpml_fixed')) {
-				add_action('admin_notices', array($this, 'post_smtp_wpml_admin_notice'));
-			}
-		}
+        add_filter( 'extra_plugin_headers', [ $this, 'add_extension_headers' ] );
 
 		// hook on the wp_loaded event
 		add_action( 'wp_loaded', array(
@@ -179,6 +167,12 @@ class Postman {
 
 	}
 
+    function add_extension_headers($headers) {
+        $headers[] = 'Class';
+        $headers[] = 'Slug';
+
+        return $headers;
+    }
 
 	/**
 	 * Functions to execute on the plugins_loaded event
@@ -188,7 +182,8 @@ class Postman {
 	 */
 	public function on_plugins_loaded() {
 
-        PostmanLicenseManager::get_instance()->init();
+		// register the email transports
+		$this->registerTransports( $this->rootPluginFilenameAndPath );
 
 		// load the text domain
 		$this->loadTextDomain();
@@ -198,6 +193,7 @@ class Postman {
 		if ( PostmanUtils::isAdmin() && is_admin() ) {
 			$this->setup_admin();
 		}
+		
 	}
 
 	/**
@@ -370,13 +366,13 @@ class Postman {
             <p style="font-size: 18px; font-weight: bold;">Please notice</p>
             <p style="font-size: 14px; line-height: 1.7;">
                 <?php _e('Post SMTP v2 includes and new feature called: <b>Mailer Type</b>.', 'post-smtp' ); ?><br>
-                <?php _e('I highly recommend to change and <strong>TEST</strong> Post SMTP with the value <code>PHPMailer</code>.', 'post-smtp' ); ?><br>
-                <?php _e('if it will not work properly you can change back to the default value: <code>PostSMTP</code>.', 'post-smtp' ); ?><br>
-                <a target="_blank" href="<?php echo POST_SMTP_URL; ?>/style/images/mailer-type.gif">
-                    <figure>
-                        <img width="180" src="<?php echo POST_SMTP_URL; ?>/style/images/mailer-type.gif" alt="how to set mailer type">
+                <?php _e('I recommend to change it and <strong>TEST</strong> Post SMTP with the value <code>PHPMailer</code>.', 'post-smtp' ); ?><br>
+                <?php _e('<strong>ONLY</strong> if the default mailer type is not working for you.', 'post-smtp' ); ?><br>
+                <a target="_blank" href="<?php echo POST_SMTP_ASSETS; ?>images/gif/mailer-type.gif">
+                    <div>
+                        <img width="300" src="<?php echo POST_SMTP_ASSETS; ?>images/gif/mailer-type.gif" alt="how to set mailer type">
                         <figcaption><?php _e('click to enlarge image.', 'post-smtp' ); ?></figcaption>
-                    </figure>
+                    </div>
                 </a>
             </p>
         </div>
@@ -413,7 +409,7 @@ class Postman {
 			}
 			$message .= (sprintf( ' %s | %s', $goToEmailLog, $goToSettings ));
 			$message .= '<input type="hidden" name="security" class="security" value="' . wp_create_nonce('postsmtp') . '">';
-			
+
 			$hide = get_option('postman_release_version' );
 
 			if ( $msg['error'] == true && ! $hide ) {
@@ -427,10 +423,15 @@ class Postman {
 	 *
 	 * The Gmail API used to be a separate plugin which was registered when that plugin
 	 * was loaded. But now both the SMTP, Gmail API and other transports are registered here.
-	 *
+	 * @since 2.0.25 require `PostmanAdminController.php` if not exists.
 	 * @param mixed $pluginData
 	 */
 	private function registerTransports( $rootPluginFilenameAndPath ) {
+
+		if( !class_exists( 'PostmanAdminController' ) ) {
+			require_once 'PostmanAdminController.php';
+		}
+
 	    $postman_transport_registry = PostmanTransportRegistry::getInstance();
 
         $postman_transport_registry->registerTransport( new PostmanDefaultModuleTransport( $rootPluginFilenameAndPath ) );
@@ -439,6 +440,7 @@ class Postman {
         $postman_transport_registry->registerTransport( new PostmanMandrillTransport( $rootPluginFilenameAndPath ) );
         $postman_transport_registry->registerTransport( new PostmanSendGridTransport( $rootPluginFilenameAndPath ) );
         $postman_transport_registry->registerTransport( new PostmanMailgunTransport( $rootPluginFilenameAndPath ) );
+        $postman_transport_registry->registerTransport( new PostmanSendinblueTransport( $rootPluginFilenameAndPath ) );
 
 		do_action( 'postsmtp_register_transport', $postman_transport_registry );
 	}

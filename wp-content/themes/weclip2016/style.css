@@ -111,6 +111,7 @@ em strong, strong em {font-family:  "museo-sans-i7", "museo-sans", sans-serif;fo
 .clear:after { content:''; display:block; clear:both}
 
 img.aligncenter {   margin: auto;}
+.talignleft {text-align: left}
 
 /*
 ------- L A Y O U T -------
@@ -196,7 +197,8 @@ span.third-line:after { content:'';height: 1px;background: #1E293B;width: 45px;d
 .footRuler { width: calc(100% - 26px) ;border-bottom: 2px solid #BBC1C7; height:10px; margin-left:3px; float:left;}
 
 .bottomFoot { }
-.contactBlock {float:left; padding:30px 0;margin-left:40px; margin-top:5px;font-size: .8em; font-weight:600}
+.contactBlock {float:left; padding:30px 0;margin-left:40px; margin-top:5px;font-size: .8em; font-weight:600; text-align: center;}
+.contactBlock span span { color:#EB4819}
 .contactBlock.email { background: url(gfx/icon-mail.svg) center top no-repeat }
 .contactBlock.tel { background:url(gfx/icon-chat.svg) center top no-repeat }
 .contactBlock:first-child { margin-left:26px}
@@ -517,6 +519,33 @@ a.bestelButton:hover::after { right:10px;}
 .wclp #cf7md-form .mdc-switch.mdc-switch--checked .mdc-switch__thumb-underlay::after,
 .wclp #cf7md-form .mdc-switch:not(.mdc-switch--checked) .mdc-switch__thumb-underlay::before, #cf7md-form .mdc-switch:not(.mdc-switch--checked) .mdc-switch__thumb-underlay::after { background-color:#eb4819; border-color: #eb4819;}
 .wclp .dnd-upload-counter { position:relative}
+
+.wpcf7-response-output,
+.wpcf7 div.wpcf7-response-output{
+    color: #EB4819;
+    padding: 20px;
+    margin: 20px;
+    border: 2px solid #EB4819;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/** CF STYLE **/
+/*
+.material-icons.prefix { font-family: 'Material Icons';font-size: 24px; }
+.wpcf7-form input[type=number],
+.wpcf7-form input[type=text],
+.wpcf7-form input[type=email],
+.wpcf7-form textarea{
+	margin-left: 3rem;
+    width: 92%;
+    width: calc(100% - 3rem);
+	border:none;
+	border-bottom: 1px solid #9e9e9e;
+}
+.wpcf7-form-control-wrap {}
+.smallColumn {width: 94%;margin: auto; clear:both;Max-width:680px}
+*/
 /*
 ::-webkit-input-placeholder {color:#fff; }
 :-moz-placeholder { color:#fff; }
@@ -707,6 +736,7 @@ background-image: url("images/text_extra.png");
 }
 .row, .row-pad {width: 94%;margin: auto; clear:both;}
 .row .col:first-child, .row-pad .col:first-child {margin-left:0;}
+
 
 
 

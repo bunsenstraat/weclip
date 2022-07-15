@@ -1,33 +1,25 @@
 <?php
-/**
- * Post Builder for the indexables.
- *
- * @package Yoast\YoastSEO\Builders
- */
 
 namespace Yoast\WP\SEO\Builders;
 
-use Exception;
-use WPSEO_Meta;
+use WP_Error;
+use WP_Post;
+use Yoast\WP\SEO\Exceptions\Indexable\Post_Not_Found_Exception;
+use Yoast\WP\SEO\Helpers\Meta_Helper;
 use Yoast\WP\SEO\Helpers\Post_Helper;
-use Yoast\WP\SEO\Loggers\Logger;
+use Yoast\WP\SEO\Helpers\Post_Type_Helper;
 use Yoast\WP\SEO\Models\Indexable;
 use Yoast\WP\SEO\Repositories\Indexable_Repository;
-use Yoast\WP\SEO\Repositories\SEO_Meta_Repository;
-use YoastSEO_Vendor\Psr\Log\LogLevel;
+use Yoast\WP\SEO\Values\Indexables\Indexable_Builder_Versions;
 
 /**
+ * Post Builder for the indexables.
+ *
  * Formats the post meta to indexable format.
  */
 class Indexable_Post_Builder {
-	use Indexable_Social_Image_Trait;
 
-	/**
-	 * Yoast extension of the Model class.
-	 *
-	 * @var SEO_Meta_Repository
-	 */
-	protected $seo_meta_repository;
+	use Indexable_Social_Image_Trait;
 
 	/**
 	 * The indexable repository.
@@ -41,28 +33,47 @@ class Indexable_Post_Builder {
 	 *
 	 * @var Post_Helper
 	 */
-	protected $post;
+	protected $post_helper;
 
 	/**
-	 * Holds the logger.
+	 * The post type helper.
 	 *
-	 * @var Logger
+	 * @var Post_Type_Helper
 	 */
-	protected $logger;
+	protected $post_type_helper;
+
+	/**
+	 * Knows the latest version of the Indexable post builder type.
+	 *
+	 * @var int
+	 */
+	protected $version;
+
+	/**
+	 * The meta helper.
+	 *
+	 * @var Meta_Helper
+	 */
+	protected $meta;
 
 	/**
 	 * Indexable_Post_Builder constructor.
 	 *
-	 * @codeCoverageIgnore This is dependency injection only.
-	 *
-	 * @param SEO_Meta_Repository $seo_meta_repository The SEO Meta repository.
-	 * @param Post_Helper         $post                The post helper.
-	 * @param Logger              $logger              The logger.
+	 * @param Post_Helper                $post_helper      The post helper.
+	 * @param Post_Type_Helper           $post_type_helper The post type helper.
+	 * @param Indexable_Builder_Versions $versions         The indexable builder versions.
+	 * @param Meta_Helper                $meta             The meta helper.
 	 */
-	public function __construct( SEO_Meta_Repository $seo_meta_repository, Post_Helper $post, Logger $logger ) {
-		$this->seo_meta_repository = $seo_meta_repository;
-		$this->post                = $post;
-		$this->logger              = $logger;
+	public function __construct(
+		Post_Helper $post_helper,
+		Post_Type_Helper $post_type_helper,
+		Indexable_Builder_Versions $versions,
+		Meta_Helper $meta
+	) {
+		$this->post_helper      = $post_helper;
+		$this->post_type_helper = $post_type_helper;
+		$this->version          = $versions->get_latest_version_for_type( 'post' );
+		$this->meta             = $meta;
 	}
 
 	/**
@@ -83,41 +94,46 @@ class Indexable_Post_Builder {
 	 * @param Indexable $indexable The indexable to format.
 	 *
 	 * @return bool|Indexable The extended indexable. False when unable to build.
+	 *
+	 * @throws Post_Not_Found_Exception When the post could not be found.
 	 */
 	public function build( $post_id, $indexable ) {
-		$post = $this->post->get_post( $post_id );
+		if ( ! $this->post_helper->is_post_indexable( $post_id ) ) {
+			return false;
+		}
+
+		$post = $this->post_helper->get_post( $post_id );
 
 		if ( $post === null ) {
+			throw new Post_Not_Found_Exception();
+		}
+
+		if ( $this->should_exclude_post( $post ) ) {
 			return false;
 		}
 
 		$indexable->object_id       = $post_id;
 		$indexable->object_type     = 'post';
 		$indexable->object_sub_type = $post->post_type;
-		if ( $post->post_type !== 'attachment' ) {
-			$indexable->permalink = \get_permalink( $post_id );
-		}
-		else {
-			$indexable->permalink = \wp_get_attachment_url( $post_id );
-		}
-
+		$indexable->permalink       = $this->get_permalink( $post->post_type, $post_id );
 
 		$indexable->primary_focus_keyword_score = $this->get_keyword_score(
-			$this->get_meta_value( $post_id, 'focuskw' ),
-			(int) $this->get_meta_value( $post_id, 'linkdex' )
+			$this->meta->get_value( 'focuskw', $post_id ),
+			(int) $this->meta->get_value( 'linkdex', $post_id )
 		);
 
-		$indexable->readability_score = (int) $this->get_meta_value( $post_id, 'content_score' );
+		$indexable->readability_score = (int) $this->meta->get_value( 'content_score', $post_id );
 
-		$indexable->is_cornerstone    = ( $this->get_meta_value( $post_id, 'is_cornerstone' ) === '1' );
+		$indexable->is_cornerstone    = ( $this->meta->get_value( 'is_cornerstone', $post_id ) === '1' );
 		$indexable->is_robots_noindex = $this->get_robots_noindex(
-			$this->get_meta_value( $post_id, 'meta-robots-noindex' )
+			(int) $this->meta->get_value( 'meta-robots-noindex', $post_id )
 		);
 
 		// Set additional meta-robots values.
-		$indexable->is_robots_nofollow = ( $this->get_meta_value( $post_id, 'meta-robots-nofollow' ) === '1' );
-		$noindex_advanced              = $this->get_meta_value( $post_id, 'meta-robots-adv' );
+		$indexable->is_robots_nofollow = ( $this->meta->get_value( 'meta-robots-nofollow', $post_id ) === '1' );
+		$noindex_advanced              = $this->meta->get_value( 'meta-robots-adv', $post_id );
 		$meta_robots                   = \explode( ',', $noindex_advanced );
+
 		foreach ( $this->get_robots_options() as $meta_robots_option ) {
 			$indexable->{'is_robots_' . $meta_robots_option} = \in_array( $meta_robots_option, $meta_robots, true ) ? 1 : null;
 		}
@@ -125,7 +141,7 @@ class Indexable_Post_Builder {
 		$this->reset_social_images( $indexable );
 
 		foreach ( $this->get_indexable_lookup() as $meta_key => $indexable_key ) {
-			$indexable->{$indexable_key} = $this->get_meta_value( $post_id, $meta_key );
+			$indexable->{$indexable_key} = $this->empty_string_to_null( $this->meta->get_value( $meta_key, $post_id ) );
 		}
 
 		if ( empty( $indexable->breadcrumb_title ) ) {
@@ -133,8 +149,6 @@ class Indexable_Post_Builder {
 		}
 
 		$this->handle_social_images( $indexable );
-
-		$indexable = $this->set_link_count( $post_id, $indexable );
 
 		$indexable->author_id   = $post->post_author;
 		$indexable->post_parent = $post->post_parent;
@@ -146,7 +160,31 @@ class Indexable_Post_Builder {
 		$indexable->has_public_posts = $this->has_public_posts( $indexable );
 		$indexable->blog_id          = \get_current_blog_id();
 
+		$indexable->schema_page_type    = $this->empty_string_to_null( $this->meta->get_value( 'schema_page_type', $post_id ) );
+		$indexable->schema_article_type = $this->empty_string_to_null( $this->meta->get_value( 'schema_article_type', $post_id ) );
+
+		$indexable->object_last_modified = $post->post_modified_gmt;
+		$indexable->object_published_at  = $post->post_date_gmt;
+
+		$indexable->version = $this->version;
+
 		return $indexable;
+	}
+
+	/**
+	 * Retrieves the permalink for a post with the given post type and ID.
+	 *
+	 * @param string $post_type The post type.
+	 * @param int    $post_id   The post ID.
+	 *
+	 * @return false|string|WP_Error The permalink.
+	 */
+	protected function get_permalink( $post_type, $post_id ) {
+		if ( $post_type !== 'attachment' ) {
+			return \get_permalink( $post_id );
+		}
+
+		return \wp_get_attachment_url( $post_id );
 	}
 
 	/**
@@ -170,7 +208,7 @@ class Indexable_Post_Builder {
 			return $this->is_public_attachment( $indexable );
 		}
 
-		if ( ! \in_array( $indexable->post_status, $this->is_public_post_status(), true ) ) {
+		if ( ! \in_array( $indexable->post_status, $this->post_helper->get_public_post_statuses(), true ) ) {
 			return false;
 		}
 
@@ -231,20 +269,6 @@ class Indexable_Post_Builder {
 	}
 
 	/**
-	 * Retrieves the list of public posts statuses.
-	 *
-	 * @return array The public post statuses.
-	 */
-	protected function is_public_post_status() {
-		/**
-		 * Filter: 'wpseo_public_post_statuses' - List of public post statuses.
-		 *
-		 * @apo array $post_statuses Post status list, defaults to array( 'publish' ).
-		 */
-		return \apply_filters( 'wpseo_public_post_statuses', [ 'publish' ] );
-	}
-
-	/**
 	 * Converts the meta robots noindex value to the indexable value.
 	 *
 	 * @param int $value Meta value to convert.
@@ -279,7 +303,7 @@ class Indexable_Post_Builder {
 	 * @param string $keyword The focus keyword that is set.
 	 * @param int    $score   The score saved on the meta data.
 	 *
-	 * @return null|int Score to use.
+	 * @return int|null Score to use.
 	 */
 	protected function get_keyword_score( $keyword, $score ) {
 		if ( empty( $keyword ) ) {
@@ -296,60 +320,21 @@ class Indexable_Post_Builder {
 	 */
 	protected function get_indexable_lookup() {
 		return [
-			'focuskw'               => 'primary_focus_keyword',
-			'canonical'             => 'canonical',
-			'title'                 => 'title',
-			'metadesc'              => 'description',
-			'bctitle'               => 'breadcrumb_title',
-			'opengraph-title'       => 'open_graph_title',
-			'opengraph-image'       => 'open_graph_image',
-			'opengraph-image-id'    => 'open_graph_image_id',
-			'opengraph-description' => 'open_graph_description',
-			'twitter-title'         => 'twitter_title',
-			'twitter-image'         => 'twitter_image',
-			'twitter-image-id'      => 'twitter_image_id',
-			'twitter-description'   => 'twitter_description',
+			'focuskw'                        => 'primary_focus_keyword',
+			'canonical'                      => 'canonical',
+			'title'                          => 'title',
+			'metadesc'                       => 'description',
+			'bctitle'                        => 'breadcrumb_title',
+			'opengraph-title'                => 'open_graph_title',
+			'opengraph-image'                => 'open_graph_image',
+			'opengraph-image-id'             => 'open_graph_image_id',
+			'opengraph-description'          => 'open_graph_description',
+			'twitter-title'                  => 'twitter_title',
+			'twitter-image'                  => 'twitter_image',
+			'twitter-image-id'               => 'twitter_image_id',
+			'twitter-description'            => 'twitter_description',
+			'estimated-reading-time-minutes' => 'estimated_reading_time_minutes',
 		];
-	}
-
-	/**
-	 * Updates the link count from existing data.
-	 *
-	 * @param int       $post_id   The post ID to use.
-	 * @param Indexable $indexable The indexable to extend.
-	 *
-	 * @return Indexable The extended indexable.
-	 */
-	protected function set_link_count( $post_id, Indexable $indexable ) {
-		try {
-			$seo_meta = $this->seo_meta_repository->find_by_post_id( $post_id );
-
-			if ( $seo_meta ) {
-				$indexable->link_count          = $seo_meta->internal_link_count;
-				$indexable->incoming_link_count = $seo_meta->incoming_link_count;
-			}
-		} catch ( Exception $exception ) {
-			$this->logger->log( LogLevel::ERROR, $exception->getMessage() );
-		}
-
-		return $indexable;
-	}
-
-	/**
-	 * Retrieves the current value for the meta field.
-	 *
-	 * @param int    $post_id  The post ID to use.
-	 * @param string $meta_key Meta key to fetch.
-	 *
-	 * @return mixed The value of the indexable entry to use.
-	 */
-	protected function get_meta_value( $post_id, $meta_key ) {
-		$value = WPSEO_Meta::get_value( $meta_key, $post_id );
-		if ( \is_string( $value ) && $value === '' ) {
-			return null;
-		}
-
-		return $value;
 	}
 
 	/**
@@ -398,42 +383,6 @@ class Indexable_Post_Builder {
 	}
 
 	/**
-	 * Sets the alternative on an indexable.
-	 *
-	 * @param array     $alternative_image The alternative image to set.
-	 * @param Indexable $indexable         The indexable to set image for.
-	 */
-	protected function set_alternative_image( array $alternative_image, Indexable $indexable ) {
-
-		if ( ! empty( $alternative_image['image_id'] ) ) {
-			if ( ! $indexable->open_graph_image_source && ! $indexable->open_graph_image_id ) {
-				$indexable->open_graph_image_id     = $alternative_image['image_id'];
-				$indexable->open_graph_image_source = $alternative_image['source'];
-
-				$this->set_open_graph_image_meta_data( $indexable );
-			}
-
-			if ( ! $indexable->twitter_image && ! $indexable->twitter_image_id ) {
-				$indexable->twitter_image        = $this->twitter_image->get_by_id( $alternative_image['image_id'] );
-				$indexable->twitter_image_id     = $alternative_image['image_id'];
-				$indexable->twitter_image_source = $alternative_image['source'];
-			}
-		}
-
-		if ( ! empty( $alternative_image['image'] ) ) {
-			if ( ! $indexable->open_graph_image_source && ! $indexable->open_graph_image_id ) {
-				$indexable->open_graph_image        = $alternative_image['image'];
-				$indexable->open_graph_image_source = $alternative_image['source'];
-			}
-
-			if ( ! $indexable->twitter_image && ! $indexable->twitter_image_id ) {
-				$indexable->twitter_image        = $alternative_image['image'];
-				$indexable->twitter_image_source = $alternative_image['source'];
-			}
-		}
-	}
-
-	/**
 	 * Gets the number of pages for a post.
 	 *
 	 * @param object $post The post object.
@@ -451,20 +400,28 @@ class Indexable_Post_Builder {
 	}
 
 	/**
-	 * Sets the OG image meta data for an og image
+	 * Checks whether an indexable should be built for this post.
 	 *
-	 * @param Indexable $indexable The indexable.
+	 * @param WP_Post $post The post for which an indexable should be built.
+	 *
+	 * @return bool `true` if the post should be excluded from building, `false` if not.
 	 */
-	protected function set_open_graph_image_meta_data( Indexable $indexable ) {
-		if ( ! $indexable->open_graph_image_id ) {
-			return;
+	protected function should_exclude_post( $post ) {
+		return $this->post_type_helper->is_excluded( $post->post_type );
+	}
+
+	/**
+	 * Transforms an empty string into null. Leaves non-empty strings intact.
+	 *
+	 * @param string $string The string.
+	 *
+	 * @return string|null The input string or null.
+	 */
+	protected function empty_string_to_null( $string ) {
+		if ( ! is_string( $string ) || $string === '' ) {
+			return null;
 		}
 
-		$image = $this->open_graph_image->get_image_by_id( $indexable->open_graph_image_id );
-
-		if ( ! empty( $image ) ) {
-			$indexable->open_graph_image      = $image['url'];
-			$indexable->open_graph_image_meta = \wp_json_encode( $image );
-		}
+		return $string;
 	}
 }

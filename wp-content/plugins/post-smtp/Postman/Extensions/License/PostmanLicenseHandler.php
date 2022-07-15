@@ -7,6 +7,9 @@ if ( ! class_exists( 'PostmanLicenseHandler' ) ) :
 
 
 class PostmanLicenseHandler {
+
+	const DAYS_TO_ALERT = array( 30, 14, 7, 1);
+
     private $file;
     private $license;
     private $license_data;
@@ -15,7 +18,7 @@ class PostmanLicenseHandler {
     private $item_shortname;
     private $version;
     private $author;
-	private $api_url = 'http://localhost/psp/';
+	private $api_url = 'https://postmansmtp.com';
 
 
 	function __construct( $_file, $_item_name, $_version, $_author, $_optname = null, $_api_url = null, $_item_id = null ) {
@@ -81,7 +84,6 @@ class PostmanLicenseHandler {
 
 		add_action( 'init', array( $this, 'cron' ), 20 );
 
-		// Check that license is valid once per week
         add_action( 'admin_init', array( $this, 'validate_license' ) );
 
 		// Updater
@@ -90,7 +92,7 @@ class PostmanLicenseHandler {
 		// Display notices to admins
 		add_action( 'admin_notices', array( $this, 'notices' ) );
 
-		add_action( 'in_plugin_update_message-' . plugin_basename( $this->file ), array( $this, 'plugin_row_license_missing' ), 10, 2 );
+		//add_action( 'in_plugin_update_message-' . plugin_basename( $this->file ), array( $this, 'plugin_row_license_missing' ), 10, 2 );
 	}
 
     /**
@@ -241,14 +243,15 @@ class PostmanLicenseHandler {
 		set_site_transient( 'update_plugins', null );
 
 		// Decode license data
-		$license_data = json_decode( wp_remote_retrieve_body( $response ) );
+		$this->license_data = json_decode( wp_remote_retrieve_body( $response ) );
 
-		update_option( $this->item_shortname . '_license_active', $license_data );
+		update_option( $this->item_shortname . '_license_active', $this->license_data );
 		update_option( $this->item_shortname . '_license_key', $license );
 
-		$slug = plugin_basename($this->file);
-        PostmanLicenseManager::get_instance()->add_extension($slug);
-
+		if ( $this->license_data->success && $this->license_data->license == 'valid' ) {
+            $slug = plugin_basename($this->file);
+            PostmanLicenseManager::get_instance()->add_extension($slug);
+        }
 	}
 
 
@@ -307,7 +310,7 @@ class PostmanLicenseHandler {
         }
 
         // Decode the license data
-        $license_data = json_decode( wp_remote_retrieve_body( $response ) );
+		$this->license_data = json_decode( wp_remote_retrieve_body( $response ) );
 
         delete_option( $this->item_shortname . '_license_active' );
         delete_option( $this->item_shortname . '_license_key' );
@@ -322,6 +325,55 @@ class PostmanLicenseHandler {
             $this->license_check();
 
             set_transient( $this->item_shortname . '_cron', true, rand( 12, 48 ) *  HOUR_IN_SECONDS );
+        }
+
+        $license_data = $this->license_data;
+
+        if ( $license_data && isset( $license_data->expires ) ) {
+            if ( $license_data->expires == 'lifetime' ) {
+                $expires = '2500/12/12';
+            } else {
+                $expires = $license_data->expires;
+            }
+        } else {
+            return;
+        }
+
+		$datetime1 = new DateTime();
+
+		if ( is_numeric( $expires ) ) {
+            $datetime2 = new DateTime();
+            $datetime2->setTimestamp( $expires );
+        } else {
+            $datetime2 = new DateTime( $expires );
+        }
+
+		foreach ( self::DAYS_TO_ALERT as $day_to_alert ) {
+
+	        $interval = $datetime1->diff($datetime2);
+	        if( $interval->days == $day_to_alert ){
+		        add_action( 'admin_notices', function () use ( $day_to_alert, $license_data ) {
+			        //echo $this->item_name . ' is about to expire in ' . $day_to_alert . ' days: ' . $license_data->expires;
+		        });
+
+		        return;
+	        }
+
+	        if ( $interval->days == 0 ) {
+		        add_action( 'admin_notices', function () use ( $license_data ) {
+			        //echo $this->item_name . ' license expire today at: ' . $license_data->expires;
+		        });
+
+		        return;
+	        }
+        }
+
+        if ( $license_data->activations_left == 0 ) {
+	        add_action( 'admin_notices', function () use ( $license_data ) {
+		        //echo $this->item_name . ' has no activations';
+	        });
+
+	        return;
         }
     }
 
@@ -357,10 +409,18 @@ class PostmanLicenseHandler {
 			return false;
 		}
 
-		$license_data = json_decode( wp_remote_retrieve_body( $response ) );
+		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
+			return false;
+		}
 
-		update_option( $this->item_shortname . '_license_active', $license_data );
+		$this->license_data = json_decode( wp_remote_retrieve_body( $response ) );
 
+		update_option( $this->item_shortname . '_license_active', $this->license_data );
+
+	}
+
+	private function get_license_data() {
+		return get_option( $this->item_shortname . '_license_active' );
 	}
 
 

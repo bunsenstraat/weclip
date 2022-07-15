@@ -1,9 +1,4 @@
 <?php
-/**
- * Yoast migrations adapter class.
- *
- * @package Yoast\WP\Lib\Migrations
- */
 
 namespace Yoast\WP\Lib\Migrations;
 
@@ -11,7 +6,7 @@ use Exception;
 use Yoast\WP\Lib\Model;
 
 /**
- * Adapter class.
+ * Yoast migrations adapter class.
  */
 class Adapter {
 
@@ -25,7 +20,7 @@ class Adapter {
 	/**
 	 * Whether or not a transaction has been started.
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	private $in_transaction = false;
 
@@ -43,7 +38,7 @@ class Adapter {
 	/**
 	 * Checks support for migrations.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function supports_migrations() {
 		return true;
@@ -56,18 +51,32 @@ class Adapter {
 	 */
 	public function native_database_types() {
 		$types = [
-			'primary_key'   => [ 'name' => 'integer', 'limit' => 11, 'null' => false ],
-			'string'        => [ 'name' => 'varchar', 'limit' => 255 ],
+			'primary_key'   => [
+				'name'  => 'integer',
+				'limit' => 11,
+				'null'  => false,
+			],
+			'string'        => [
+				'name'  => 'varchar',
+				'limit' => 255,
+			],
 			'text'          => [ 'name' => 'text' ],
 			'tinytext'      => [ 'name' => 'tinytext' ],
 			'mediumtext'    => [ 'name' => 'mediumtext' ],
-			'integer'       => [ 'name' => 'int', 'limit' => 11 ],
+			'integer'       => [
+				'name'  => 'int',
+				'limit' => 11,
+			],
 			'tinyinteger'   => [ 'name' => 'tinyint' ],
 			'smallinteger'  => [ 'name' => 'smallint' ],
 			'mediuminteger' => [ 'name' => 'mediumint' ],
 			'biginteger'    => [ 'name' => 'bigint' ],
 			'float'         => [ 'name' => 'float' ],
-			'decimal'       => [ 'name' => 'decimal', 'scale' => 0, 'precision' => 10 ],
+			'decimal'       => [
+				'name'      => 'decimal',
+				'scale'     => 0,
+				'precision' => 10,
+			],
 			'datetime'      => [ 'name' => 'datetime' ],
 			'timestamp'     => [ 'name' => 'timestamp' ],
 			'time'          => [ 'name' => 'time' ],
@@ -76,9 +85,18 @@ class Adapter {
 			'tinybinary'    => [ 'name' => 'tinyblob' ],
 			'mediumbinary'  => [ 'name' => 'mediumblob' ],
 			'longbinary'    => [ 'name' => 'longblob' ],
-			'boolean'       => [ 'name' => 'tinyint', 'limit' => 1 ],
-			'enum'          => [ 'name' => 'enum', 'values' => [] ],
-			'uuid'          => [ 'name' => 'char', 'limit' => 36 ],
+			'boolean'       => [
+				'name'  => 'tinyint',
+				'limit' => 1,
+			],
+			'enum'          => [
+				'name'   => 'enum',
+				'values' => [],
+			],
+			'uuid'          => [
+				'name'  => 'char',
+				'limit' => 36,
+			],
 			'char'          => [ 'name' => 'char' ],
 		];
 
@@ -90,7 +108,7 @@ class Adapter {
 	 *
 	 * @param string $table The table name.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function has_table( $table ) {
 		return $this->table_exists( $table );
@@ -147,20 +165,20 @@ class Adapter {
 	/**
 	 * Quotes a table name string.
 	 *
-	 * @param string $string table name.
+	 * @param string $text Table name.
 	 *
 	 * @return string
 	 */
-	public function quote_table( $string ) {
-		return '`' . $string . '`';
+	public function quote_table( $text ) {
+		return '`' . $text . '`';
 	}
 
 	/**
 	 * Return the SQL definition of a column.
 	 *
-	 * @param string $column_name The column name.
-	 * @param string $type        The type of the column.
-	 * @param array  $options     Column options.
+	 * @param string     $column_name The column name.
+	 * @param string     $type        The type of the column.
+	 * @param array|null $options     Column options.
 	 *
 	 * @return string
 	 */
@@ -175,7 +193,7 @@ class Adapter {
 	 *
 	 * @param string $database The database name.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function database_exists( $database ) {
 		$ddl    = 'SHOW DATABASES';
@@ -195,9 +213,9 @@ class Adapter {
 	/**
 	 * Creates a database.
 	 *
-	 * @param string $db the database name.
+	 * @param string $db The database name.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function create_database( $db ) {
 		if ( $this->database_exists( $db ) ) {
@@ -212,9 +230,9 @@ class Adapter {
 	/**
 	 * Drops a database.
 	 *
-	 * @param string $db the database name.
+	 * @param string $db The database name.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function drop_database( $db ) {
 		if ( ! $this->database_exists( $db ) ) {
@@ -231,7 +249,7 @@ class Adapter {
 	 *
 	 * @param string $table The table name.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function table_exists( $table ) {
 		global $wpdb;
@@ -256,7 +274,7 @@ class Adapter {
 	 *
 	 * @param string $query The query to run.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function execute( $query ) {
 		return $this->query( $query );
@@ -267,7 +285,7 @@ class Adapter {
 	 *
 	 * @param string $query The query to run.
 	 *
-	 * @return boolean Whether or not the query was performed succesfully.
+	 * @return bool Whether or not the query was performed succesfully.
 	 */
 	public function query( $query ) {
 		global $wpdb;
@@ -301,7 +319,7 @@ class Adapter {
 	 *
 	 * @param string $query The query to run.
 	 *
-	 * @return array An associative array of the result.
+	 * @return array|false An associative array of the result.
 	 */
 	public function select_one( $query ) {
 		global $wpdb;
@@ -336,7 +354,7 @@ class Adapter {
 	 *
 	 * @param string $ddl The query to run.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function execute_ddl( $ddl ) {
 		return $this->query( $ddl );
@@ -347,7 +365,7 @@ class Adapter {
 	 *
 	 * @param string $table The table name.
 	 *
-	 * @return boolean Whether or not the table was succesfully dropped.
+	 * @return bool Whether or not the table was succesfully dropped.
 	 */
 	public function drop_table( $table ) {
 		$ddl = \sprintf( 'DROP TABLE IF EXISTS %s', $this->identifier( $table ) );
@@ -360,7 +378,7 @@ class Adapter {
 	 * @param string $table_name The table name.
 	 * @param array  $options    The options.
 	 *
-	 * @return bool|Table
+	 * @return Table
 	 */
 	public function create_table( $table_name, $options = [] ) {
 		return new Table( $this, $table_name, $options );
@@ -369,25 +387,25 @@ class Adapter {
 	/**
 	 * Escapes a string for usage in queries.
 	 *
-	 * @param string $string The string.
+	 * @param string $text The string.
 	 *
 	 * @return string
 	 */
-	public function quote_string( $string ) {
+	public function quote_string( $text ) {
 		global $wpdb;
 
-		return $wpdb->_escape( $string );
+		return $wpdb->_escape( $text );
 	}
 
 	/**
 	 * Returns a quoted string.
 	 *
-	 * @param string $string the string.
+	 * @param string $text The string.
 	 *
 	 * @return string
 	 */
-	public function identifier( $string ) {
-		return '`' . $string . '`';
+	public function identifier( $text ) {
+		return '`' . $text . '`';
 	}
 
 	/**
@@ -396,7 +414,7 @@ class Adapter {
 	 * @param string $name     The current table name.
 	 * @param string $new_name The new table name.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function rename_table( $name, $new_name ) {
 		if ( empty( $name ) || empty( $new_name ) ) {
@@ -415,10 +433,10 @@ class Adapter {
 	 * @param string $type        The column type.
 	 * @param array  $options     Column options.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function add_column( $table_name, $column_name, $type, $options = [] ) {
-		if ( empty( $table_name ) || empty( $column_name ) ||  empty( $type ) ) {
+		if ( empty( $table_name ) || empty( $column_name ) || empty( $type ) ) {
 			return false;
 		}
 		// Default types.
@@ -431,7 +449,7 @@ class Adapter {
 		if ( ! \array_key_exists( 'scale', $options ) ) {
 			$options['scale'] = null;
 		}
-		$sql = \sprintf( 'ALTER TABLE %s ADD `%s` %s', $this->identifier( $table_name ), $column_name, $this->type_to_sql( $type, $options ) );
+		$sql  = \sprintf( 'ALTER TABLE %s ADD `%s` %s', $this->identifier( $table_name ), $column_name, $this->type_to_sql( $type, $options ) );
 		$sql .= $this->add_column_options( $type, $options );
 
 		return $this->execute_ddl( $sql );
@@ -443,7 +461,7 @@ class Adapter {
 	 * @param string $table_name  The table name.
 	 * @param string $column_name The column name.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function remove_column( $table_name, $column_name ) {
 		$sql = \sprintf( 'ALTER TABLE %s DROP COLUMN %s', $this->identifier( $table_name ), $this->identifier( $column_name ) );
@@ -458,7 +476,7 @@ class Adapter {
 	 * @param string $column_name     The column name.
 	 * @param string $new_column_name The new column name.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function rename_column( $table_name, $column_name, $new_column_name ) {
 		if ( empty( $table_name ) || empty( $column_name ) || empty( $new_column_name ) ) {
@@ -467,7 +485,7 @@ class Adapter {
 		$column_info  = $this->column_info( $table_name, $column_name );
 		$current_type = $column_info['type'];
 		$sql          = \sprintf( 'ALTER TABLE %s CHANGE %s %s %s', $this->identifier( $table_name ), $this->identifier( $column_name ), $this->identifier( $new_column_name ), $current_type );
-		$sql          .= $this->add_column_options( $current_type, $column_info );
+		$sql         .= $this->add_column_options( $current_type, $column_info );
 
 		return $this->execute_ddl( $sql );
 	}
@@ -480,7 +498,7 @@ class Adapter {
 	 * @param string $type        The column type.
 	 * @param array  $options     Column options.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function change_column( $table_name, $column_name, $type, $options = [] ) {
 		if ( empty( $table_name ) || empty( $column_name ) || empty( $type ) ) {
@@ -497,7 +515,7 @@ class Adapter {
 		if ( ! \array_key_exists( 'scale', $options ) ) {
 			$options['scale'] = null;
 		}
-		$sql = \sprintf( 'ALTER TABLE `%s` CHANGE `%s` `%s` %s', $table_name, $column_name, $column_name, $this->type_to_sql( $type, $options ) );
+		$sql  = \sprintf( 'ALTER TABLE `%s` CHANGE `%s` `%s` %s', $table_name, $column_name, $column_name, $this->type_to_sql( $type, $options ) );
 		$sql .= $this->add_column_options( $type, $options );
 
 		return $this->execute_ddl( $sql );
@@ -506,15 +524,16 @@ class Adapter {
 	/**
 	 * Returns the database information for a column.
 	 *
-	 * @param string $table  the table name.
-	 * @param string $column the column name.
+	 * @param string $table  The table name.
+	 * @param string $column The column name.
 	 *
-	 * @return array
+	 * @return array|null
 	 */
 	public function column_info( $table, $column ) {
 		if ( empty( $table ) || empty( $column ) ) {
 			return null;
 		}
+
 		try {
 			$sql    = \sprintf( "SHOW FULL COLUMNS FROM %s LIKE '%s'", $this->identifier( $table ), $column );
 			$result = $this->select_one( $sql );
@@ -531,11 +550,11 @@ class Adapter {
 	/**
 	 * Adds an index.
 	 *
-	 * @param string $table_name  The table name.
-	 * @param string $column_name The column name.
-	 * @param array  $options     Index options.
+	 * @param string       $table_name  The table name.
+	 * @param array|string $column_name The column name(s).
+	 * @param array        $options     Index options.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function add_index( $table_name, $column_name, $options = [] ) {
 		if ( empty( $table_name ) || empty( $column_name ) ) {
@@ -573,10 +592,11 @@ class Adapter {
 			$cols[] = $this->identifier( $name );
 		}
 		$sql = \sprintf(
-			'CREATE %sINDEX %s ON %s(%s)', ( $unique === true ) ? 'UNIQUE ' : '',
+			'CREATE %sINDEX %s ON %s(%s)',
+			( $unique === true ) ? 'UNIQUE ' : '',
 			$this->identifier( $index_name ),
 			$this->identifier( $table_name ),
-			\join( ', ', $cols )
+			\implode( ', ', $cols )
 		);
 
 		return $this->execute_ddl( $sql );
@@ -585,17 +605,17 @@ class Adapter {
 	/**
 	 * Drops an index.
 	 *
-	 * @param string $table_name  The table name.
-	 * @param string $column_name The column name.
-	 * @param array  $options     Index options.
+	 * @param string       $table_name  The table name.
+	 * @param array|string $column_name The column name(s).
+	 * @param array        $options     Index options.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function remove_index( $table_name, $column_name, $options = [] ) {
 		if ( empty( $table_name ) || empty( $column_name ) ) {
 			return false;
 		}
-		// did the user specify an index name?
+		// Did the user specify an index name?
 		if ( \is_array( $options ) && \array_key_exists( 'name', $options ) ) {
 			$index_name = $options['name'];
 		}
@@ -615,18 +635,23 @@ class Adapter {
 	 * @param string $created_column_name Created at column name.
 	 * @param string $updated_column_name Updated at column name.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function add_timestamps( $table_name, $created_column_name, $updated_column_name ) {
 		if ( empty( $table_name ) || empty( $created_column_name ) || empty( $updated_column_name ) ) {
 			return false;
 		}
 		$created_at = $this->add_column( $table_name, $created_column_name, 'datetime' );
-		$updated_at = $this->add_column( $table_name, $updated_column_name, 'timestamp', [
-			'null'    => false,
-			'default' => 'CURRENT_TIMESTAMP',
-			'extra'   => 'ON UPDATE CURRENT_TIMESTAMP',
-		] );
+		$updated_at = $this->add_column(
+			$table_name,
+			$updated_column_name,
+			'timestamp',
+			[
+				'null'    => false,
+				'default' => 'CURRENT_TIMESTAMP',
+				'extra'   => 'ON UPDATE CURRENT_TIMESTAMP',
+			]
+		);
 
 		return $created_at && $updated_at;
 	}
@@ -638,7 +663,7 @@ class Adapter {
 	 * @param string $created_column_name Created at column name.
 	 * @param string $updated_column_name Updated at column name.
 	 *
-	 * @return boolean Whether or not the timestamps were removed.
+	 * @return bool Whether or not the timestamps were removed.
 	 */
 	public function remove_timestamps( $table_name, $created_column_name, $updated_column_name ) {
 		if ( empty( $table_name ) || empty( $created_column_name ) || empty( $updated_column_name ) ) {
@@ -653,17 +678,17 @@ class Adapter {
 	/**
 	 * Checks an index.
 	 *
-	 * @param string $table_name  The table name.
-	 * @param string $column_name The column name.
-	 * @param array  $options     Index options.
+	 * @param string       $table_name  The table name.
+	 * @param array|string $column_name The column name(s).
+	 * @param array        $options     Index options.
 	 *
-	 * @return boolean Whether or not the index exists.
+	 * @return bool Whether or not the index exists.
 	 */
 	public function has_index( $table_name, $column_name, $options = [] ) {
 		if ( empty( $table_name ) || empty( $column_name ) ) {
 			return false;
 		}
-		// did the user specify an index name?
+		// Did the user specify an index name?
 		if ( \is_array( $options ) && \array_key_exists( 'name', $options ) ) {
 			$index_name = $options['name'];
 		}
@@ -696,7 +721,10 @@ class Adapter {
 			if ( $row['Key_name'] === 'PRIMARY' ) {
 				continue;
 			}
-			$indexes[] = [ 'name' => $row['Key_name'], 'unique' => (int) $row['Non_unique'] === 0 ];
+			$indexes[] = [
+				'name'   => $row['Key_name'],
+				'unique' => (int) $row['Non_unique'] === 0,
+			];
 		}
 
 		return $indexes;
@@ -716,10 +744,10 @@ class Adapter {
 	public function type_to_sql( $type, $options = [] ) {
 		$natives = $this->native_database_types();
 		if ( ! \array_key_exists( $type, $natives ) ) {
-			$error = \sprintf( "Error:I dont know what column type of '%s' maps to for MySQL.", $type );
+			$error  = \sprintf( "Error:I dont know what column type of '%s' maps to for MySQL.", $type );
 			$error .= "\nYou provided: {$type}\n";
 			$error .= "Valid types are: \n";
-			$types = \array_keys( $natives );
+			$types  = \array_keys( $natives );
 			foreach ( $types as $t ) {
 				if ( $t === 'primary_key' ) {
 					continue;
@@ -777,10 +805,10 @@ class Adapter {
 				throw new Exception( 'Error adding enum column: there must be at least one value defined' );
 			}
 			else {
-				$column_type_sql .= \sprintf( "('%s')", \implode( "','", \array_map( [
-					$this,
-					'quote_string',
-				], $values ) ) );
+				$column_type_sql .= \sprintf(
+					"('%s')",
+					\implode( "','", \array_map( [ $this, 'quote_string' ], $values ) )
+				);
 			}
 		}
 		// Not a decimal column.
@@ -838,13 +866,13 @@ class Adapter {
 				$default_format = "'%s'";
 			}
 			$default_value = \sprintf( $default_format, $options['default'] );
-			$sql           .= \sprintf( ' DEFAULT %s', $default_value );
+			$sql          .= \sprintf( ' DEFAULT %s', $default_value );
 		}
 		if ( \array_key_exists( 'null', $options ) ) {
 			if ( $options['null'] === false || $options['null'] === 'NO' ) {
 				$sql .= ' NOT NULL';
 			}
-			elseif ( 'timestamp' === $type ) {
+			elseif ( $type === 'timestamp' ) {
 				$sql .= ' NULL';
 			}
 		}
@@ -867,11 +895,8 @@ class Adapter {
 	 * @return string[] The version numbers that have been migrated.
 	 */
 	public function get_migrated_versions() {
-		return \array_map(
-			function ( $row ) {
-				return $row['version'];
-			}, $this->select_all( \sprintf( 'SELECT version FROM %s', $this->get_schema_version_table_name() ) )
-		);
+		$result = $this->select_all( \sprintf( 'SELECT version FROM %s', $this->get_schema_version_table_name() ) );
+		return \array_column( $result, 'version' );
 	}
 
 	/**
@@ -879,7 +904,7 @@ class Adapter {
 	 *
 	 * @param string $version The version.
 	 *
-	 * @return boolean Whether or not the version was succesfully set.
+	 * @return bool Whether or not the version was succesfully set.
 	 */
 	public function add_version( $version ) {
 		$sql = \sprintf( "INSERT INTO %s (version) VALUES ('%s')", $this->get_schema_version_table_name(), $version );
@@ -892,7 +917,7 @@ class Adapter {
 	 *
 	 * @param string $version The version.
 	 *
-	 * @return boolean Whether or not the version was succesfully removed.
+	 * @return bool Whether or not the version was succesfully removed.
 	 */
 	public function remove_version( $version ) {
 		$sql = \sprintf( "DELETE FROM %s WHERE version = '%s'", $this->get_schema_version_table_name(), $version );
@@ -920,9 +945,9 @@ class Adapter {
 	private function get_index_name( $table_name, $column_name ) {
 		$name = \preg_replace( '/\\W/', '_', $table_name );
 		$name = \preg_replace( '/\\_{2,}/', '_', $name );
-		// if the column parameter is an array then the user wants to create a multi-column index.
+		// If the column parameter is an array then the user wants to create a multi-column index.
 		if ( \is_array( $column_name ) ) {
-			$column_str = \join( '_and_', $column_name );
+			$column_str = \implode( '_and_', $column_name );
 		}
 		else {
 			$column_str = $column_name;
@@ -973,13 +998,13 @@ class Adapter {
 	 * Detect whether or not the string represents a function call and if so
 	 * do not wrap it in single-quotes, otherwise do wrap in single quotes.
 	 *
-	 * @param string $string The string.
+	 * @param string $text The string.
 	 *
-	 * @return boolean Whether or not it's a SQL function call.
+	 * @return bool Whether or not it's a SQL function call.
 	 */
-	private function is_sql_method_call( $string ) {
-		$string = \trim( $string );
-		if ( \substr( $string, - 2, 2 ) === '()' ) {
+	private function is_sql_method_call( $text ) {
+		$text = \trim( $text );
+		if ( \substr( $text, -2, 2 ) === '()' ) {
 			return true;
 		}
 		return false;
@@ -988,7 +1013,7 @@ class Adapter {
 	/**
 	 * Checks if a transaction is active.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	private function in_transaction() {
 		return $this->in_transaction;

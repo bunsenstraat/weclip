@@ -1,35 +1,6 @@
-@font-face {
-  font-family: 'dnd-custom-font';
-  src:  url('../fonts/icomoon.eot?14xd7m');
-  src:  url('../fonts/icomoon.eot?14xd7m#iefix') format('embedded-opentype'),
-    url('../fonts/icomoon.ttf?14xd7m') format('truetype'),
-    url('../fonts/icomoon.woff?14xd7m') format('woff'),
-    url('../fonts/icomoon.svg?14xd7m#icomoon') format('svg');
-  font-weight: normal;
-  font-style: normal;
-}
-
-[class^="dnd-icon-"], [class*=" dnd-icon-"] {
-  font-family: 'dnd-custom-font' !important;
-  speak: none;
-  font-style: normal;
-  font-weight: normal;
-  font-variant: normal;
-  text-transform: none;
-  line-height: 1;
-
-  /* Better Font Rendering =========== */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-.dnd-icon-blank-file:before { content: "\e900";}
-.dnd-icon-remove:before { content: "\e901";}
-.icon-upload:before { content: "\e902";}
-
 /* Delete Status */
-.dnd-icon-remove.deleting { outline:none; font-family : inherit !important; font-size:12px; color:#000; font-weight:500; }
-.dnd-icon-remove.deleting:before {content : '';}
+.dnd-icon-remove.deleting { font-size:12px; color:#000; font-weight: 500; position: relative; top:-3px; }
+.dnd-icon-remove.deleting:after { display:none!important; }
 
 .wpcf7-drag-n-drop-file.d-none {
 	display:none;
@@ -56,36 +27,27 @@
 	border-radius:100%;
 	position:relative;
 }
-.dnd-upload-status .dnd-upload-image.has-bg {
-	background-position:center center;
-	background-size:cover;
-	background-repeat:no-repeat;
-	border:0;
-	transition: transform 0.3s ease;
-	max-width:40px;
-	width:100%;
-}
-.dnd-upload-status .dnd-upload-image.has-bg:hover {
-	transform: scale(1.5);
-}
-.dnd-upload-status .dnd-upload-image span {
-	font-size:20px;
-	color:#222;
-	position: absolute;
-    top: 50%;
-    transform: translate(-50%,-50%);
-    -moz-transform: translate(-50%,-50%);
-    -webkit-transform: translate(-50%,-50%);
+.dnd-upload-status .dnd-upload-image span.file {
+    background-image: url("data:image/svg+xml,%0A%3Csvg width='18' height='23' viewBox='0 0 18 23' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.569 0.659576H0.5V23H18V6.09053L12.569 0.659576ZM12.7872 1.93075L16.7288 5.87234H12.7872V1.93075ZM1.24468 22.2553V1.40426H12.0426V6.61702H17.2553V22.2553H1.24468Z' fill='%235C5B5B'/%3E%3C/svg%3E%0A");
+    background-repeat: no-repeat;
+    background-size: 100%;
+    height: 21px;
+    width: 16px;
+    display: block;
+    position: absolute;
     left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    -moz-transform : translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
 }
-.dnd-upload-status .dnd-upload-image.has-bg span { opacity:0; z-index:-200; }
 
 /* Progress bar - Image Details ( Name and Size ) */
 .dnd-upload-status .dnd-upload-details {
 	padding-left:10px;
 	width: calc(100% - 40px);
 }
-.dnd-upload-status .dnd-upload-details .name {color:#016d98; padding:4px 0; padding-right:25px; display:flex; }
+.dnd-upload-status .dnd-upload-details .name {color:#016d98; padding:4px 0; padding-right:60px; display:flex; }
 .dnd-upload-status .dnd-upload-details .name span { text-overflow: ellipsis; white-space: nowrap; overflow: hidden; position: relative; padding-right:10px; }
 .dnd-upload-status .dnd-upload-details .name em {color:#444242;	font-weight:700; }
 
@@ -93,11 +55,22 @@
 .dnd-upload-status .dnd-upload-details .remove-file {
 	position:absolute;
 	right:0;
-	top:6px;
+	top:10px;
 	text-decoration:none;
 	box-shadow:none;
 	outline:none;
+    opacity:1;
 }
+.dnd-upload-status .dnd-upload-details .remove-file span:after {
+    content: '';
+    width:15px;
+    height:15px;
+    display: block;
+    background-repeat:no-repeat;
+    background-size:100%;
+    background-image: url("data:image/svg+xml,%3Csvg width='35' height='35' viewBox='0 0 35 35' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M17.5 0C7.83499 0 0 7.83499 0 17.5C0 27.165 7.83499 35 17.5 35C27.165 35 35 27.165 35 17.5C34.9888 7.83965 27.1604 0.0112198 17.5 0ZM17.5 33.871C8.45857 33.871 1.12903 26.5414 1.12903 17.5C1.12903 8.45857 8.45857 1.12903 17.5 1.12903C26.5414 1.12903 33.871 8.45857 33.871 17.5C33.861 26.5373 26.5373 33.861 17.5 33.871Z' fill='black'/%3E%3Cpath d='M25.4834 9.51661C25.2629 9.29624 24.9056 9.29624 24.6852 9.51661L17.5 16.7018L10.3148 9.51661C10.0983 9.29236 9.74087 9.28615 9.51661 9.50271C9.29236 9.71927 9.28615 10.0767 9.50271 10.3009C9.50723 10.3057 9.51188 10.3103 9.51661 10.3148L16.7018 17.5L9.51661 24.6852C9.29236 24.9018 9.28615 25.2591 9.50278 25.4834C9.71941 25.7076 10.0768 25.7139 10.301 25.4972C10.3057 25.4927 10.3103 25.488 10.3148 25.4834L17.5 18.2982L24.6852 25.4834C24.9094 25.7 25.2668 25.6938 25.4834 25.4696C25.6947 25.2508 25.6947 24.9039 25.4834 24.6852L18.2982 17.5L25.4834 10.3148C25.7038 10.0944 25.7038 9.73705 25.4834 9.51661Z' fill='black'/%3E%3C/svg%3E%0A");
+}
+.dnd-upload-status.in-progress .remove-file { opacity:0.2;}
 
 .dnd-upload-status .dnd-upload-details span.has-error { color:#f50505; }
 
@@ -136,7 +109,7 @@
 .codedropz-upload-inner {
 	overflow:hidden;
 	width:100%;
-	white-space: nowrap;
+	/*white-space: nowrap;*/
 	text-align:center;
 	text-overflow: ellipsis;
 	font-weight:inherit;
@@ -149,6 +122,7 @@
 	margin:5px 0;
 	font-size:30px;
 	line-height:32px;
+    word-break:break-word;
 }
 
 /* Add border on dragenter, drag etc */

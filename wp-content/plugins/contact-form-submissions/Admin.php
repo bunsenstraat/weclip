@@ -83,8 +83,8 @@ class WPCF7SAdmin
                 <option value="0"><?php _e('Contact Form', 'contact-form-submissions'); ?></option>
                 <?php foreach ($forms as $post) {
                 ?>
-                    <?php $selected = ($post->ID == esc_attr($_GET['wpcf7_contact_form'])) ? 'selected' : ''; ?>
-                    <option value="<?php echo $post->ID; ?>" <?php echo $selected; ?>><?php echo $post->post_title; ?></option>
+                    <?php $selected = ($post->ID == filter_var($_GET['wpcf7_contact_form'], FILTER_SANITIZE_NUMBER_INT)) ? 'selected' : ''; ?>
+                    <option value="<?php echo esc_attr($post->ID); ?>" <?php echo $selected; ?>><?php echo $post->post_title; ?></option>
                 <?php
             } ?>
             </select>
@@ -128,7 +128,7 @@ class WPCF7SAdmin
         global $post_type;
         if ($query->is_admin && 'wpcf7s' === $post_type && $query->is_main_query()) {
             if(isset($_GET['wpcf7_contact_form'])){
-                $form_id = esc_attr($_GET['wpcf7_contact_form']);
+                $form_id = filter_var($_GET['wpcf7_contact_form'], FILTER_SANITIZE_NUMBER_INT);
             }
             if (!empty($form_id)) {
                 $query->set('meta_query', array(
@@ -155,7 +155,7 @@ class WPCF7SAdmin
 
         // dynamically add cols if the user selects a form
         if (isset($_GET['wpcf7_contact_form']) && !empty($_GET['wpcf7_contact_form'])) {
-            $form_id = esc_attr($_GET['wpcf7_contact_form']);
+            $form_id = filter_var($_GET['wpcf7_contact_form'], FILTER_SANITIZE_NUMBER_INT);
 
             $wpcf7s_columns = $this->get_available_columns($form_id);
 
@@ -190,7 +190,7 @@ class WPCF7SAdmin
                 ?>
                 <strong>
                 <a class="row-title" href="<?php echo get_edit_post_link($post_id); ?>">
-                    <?php echo $nested . htmlspecialchars(get_post_meta($post_id, 'sender', true)); ?>
+                    <?php echo $nested . esc_html(htmlspecialchars(get_post_meta($post_id, 'sender', true))); ?>
                 </a>
                 </strong>
                 <?php
@@ -226,14 +226,14 @@ class WPCF7SAdmin
      */
     public function mail_meta_box($post)
     {
-        $form_id = get_post_meta($post->ID, 'form_id', true);
+        $form_id = esc_html(get_post_meta($post->ID, 'form_id', true));
         $sender = esc_html(get_post_meta($post->ID, 'sender', true));
         $sender_mailto = preg_replace('/([a-zA-Z0-9_\-\.]*@\\S+\\.\\w+)/', '<a href="mailto:$1">$1</a>', $sender);
         $recipient = esc_html(get_post_meta($post->ID, 'recipient', true));
         $recipient_mailto = preg_replace('/([a-zA-Z0-9_\-\.]*@\\S+\\.\\w+)/', '<a href="mailto:$1">$1</a>', $recipient);
         $subject = esc_html(get_post_meta($post->ID, 'subject', true));
 
-        $body = apply_filters('the_content', esc_html($post->post_content));
+        $body = wp_kses_post(apply_filters('the_content', esc_html($post->post_content)));
 
         $additional_headers = esc_html(get_post_meta($post->ID, 'additional_headers', true)); ?>
         <table class="form-table contact-form-submission">
@@ -281,12 +281,13 @@ class WPCF7SAdmin
         <table class="form-table contact-form-submission">
             <tbody>
                 <?php foreach ($values as $key => $value) {
+                    $label = wp_kses_post($key);
                   // check if the value is serialized and unserialize it
                   $posted_field = is_serialized($value[0]) ? implode(', ', unserialize($value[0])) : $value[0];
                   $posted_field = esc_html($posted_field);
             ?>
                     <tr>
-                        <th scope="row"><?php _e(str_replace('wpcf7s_posted-', '', $key), 'contact-form-submissions'); ?></th>
+                        <th scope="row"><?php _e(str_replace('wpcf7s_posted-', '', $label), 'contact-form-submissions'); ?></th>
                         <td><?php echo $posted_field; ?></td>
                     </tr>
                 <?php
@@ -344,7 +345,7 @@ class WPCF7SAdmin
 
             <div id="misc-publishing-actions">
                 <div class="misc-pub-section curtime misc-pub-curtime">
-                    <span id="timestamp"><?php _e('Submitted', 'contact-form-submissions'); ?> : <b><?php echo $date; ?></b></span>
+                    <span id="timestamp"><?php _e('Submitted', 'contact-form-submissions'); ?> : <strong><?php echo esc_html($date); ?></strong></span>
                 </div>
             </div>
             <div class="clear"></div>
@@ -367,7 +368,7 @@ class WPCF7SAdmin
         $posted = array_intersect_key(
             $post_meta,
             array_flip(array_filter(array_keys($post_meta), function ($key) {
-                return preg_match('/^wpcf7s_posted-/', $key);
+                return esc_html(preg_match('/^wpcf7s_posted-/', $key));
             }))
         );
 
@@ -454,7 +455,7 @@ class WPCF7SAdmin
             $output = fopen('php://output', 'w');
 
             // add BOM to fix UTF-8 in Excel
-            fputs($output, $bom =( chr(0xEF) . chr(0xBB) . chr(0xBF) ));
+            fputs($output, ( chr(0xEF) . chr(0xBB) . chr(0xBF) ));
 
             // use the existing query but get all posts
             global $wp_query;

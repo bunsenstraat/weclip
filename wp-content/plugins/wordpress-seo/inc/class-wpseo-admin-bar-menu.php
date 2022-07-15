@@ -57,7 +57,7 @@ class WPSEO_Admin_Bar_Menu implements WPSEO_WordPress_Integration {
 	 *
 	 * Sets the asset manager to use.
 	 *
-	 * @param WPSEO_Admin_Asset_Manager $asset_manager Optional. Asset manager to use.
+	 * @param WPSEO_Admin_Asset_Manager|null $asset_manager Optional. Asset manager to use.
 	 */
 	public function __construct( WPSEO_Admin_Asset_Manager $asset_manager = null ) {
 		if ( ! $asset_manager ) {
@@ -75,6 +75,14 @@ class WPSEO_Admin_Bar_Menu implements WPSEO_WordPress_Integration {
 	 * @return void
 	 */
 	public function add_menu( WP_Admin_Bar $wp_admin_bar ) {
+
+		// On block editor pages, the admin bar only shows on mobile, where having this menu icon is not very helpful.
+		if ( is_admin() ) {
+			$screen = get_current_screen();
+			if ( isset( $screen ) && $screen->is_block_editor() ) {
+				return;
+			}
+		}
 
 		// If the current user can't write posts, this is all of no use, so let's not output an admin menu.
 		if ( ! current_user_can( 'edit_posts' ) ) {
@@ -202,16 +210,6 @@ class WPSEO_Admin_Bar_Menu implements WPSEO_WordPress_Integration {
 			];
 			$wp_admin_bar->add_menu( $admin_bar_menu_args );
 		}
-
-		if ( ! is_network_admin() && $can_manage_options ) {
-			$admin_bar_menu_args = [
-				'parent' => self::MENU_IDENTIFIER,
-				'id'     => 'wpseo-configuration-wizard',
-				'title'  => __( 'Configuration Wizard', 'wordpress-seo' ),
-				'href'   => admin_url( 'admin.php?page=' . WPSEO_Configuration_Page::PAGE_IDENTIFIER ),
-			];
-			$wp_admin_bar->add_menu( $admin_bar_menu_args );
-		}
 	}
 
 	/**
@@ -311,7 +309,7 @@ class WPSEO_Admin_Bar_Menu implements WPSEO_WordPress_Integration {
 			[
 				'id'     => 'wpseo-inlinks',
 				'title'  => __( 'Check links to this URL', 'wordpress-seo' ),
-				'href'   => 'https://search.google.com/search-console/links/drilldown?resource_id=' . urlencode( get_option( 'siteurl' ) ) . '&type=EXTERNAL&target=' . $encoded_url . '&domain=',
+				'href'   => 'https://search.google.com/search-console/links/drilldown?resource_id=' . urlencode( get_option( 'home' ) ) . '&type=EXTERNAL&target=' . $encoded_url . '&domain=',
 			],
 			[
 				'id'     => 'wpseo-kwdensity',
@@ -326,8 +324,8 @@ class WPSEO_Admin_Bar_Menu implements WPSEO_WordPress_Integration {
 			],
 			[
 				'id'     => 'wpseo-structureddata',
-				'title'  => __( 'Google Structured Data Test', 'wordpress-seo' ),
-				'href'   => 'https://search.google.com/structured-data/testing-tool#url=' . $encoded_url,
+				'title'  => __( 'Google Rich Results Test', 'wordpress-seo' ),
+				'href'   => 'https://search.google.com/test/rich-results?url=' . $encoded_url,
 			],
 			[
 				'id'     => 'wpseo-facebookdebug',

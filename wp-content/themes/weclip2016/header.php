@@ -4,6 +4,7 @@
         <title><?php wp_title(''); ?></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<meta name="google-site-verification" content="pb3hHj00AVt0DDMmuMbOAFkLHIaDNsHiBJzoBmSO_0U" />
         <link rel="stylesheet" href="<?php bloginfo('template_directory'); ?>/style.css" type="text/css" media="screen" />
         <!--[if lt IE 9]>
             <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -13,6 +14,7 @@
         <link rel="apple-touch-icon" sizes="76x76" href="<?php bloginfo('template_directory'); ?>/favicon-apple-touch-ipad.png">
         <link rel="apple-touch-icon" sizes="120x120" href="<?php bloginfo('template_directory'); ?>/favicon-apple-touch-iphone-retina.png">
         <link rel="apple-touch-icon" sizes="152x152" href="<?php bloginfo('template_directory'); ?>/favicon-apple-touch-ipad-retina.png">
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <script src="https://use.typekit.net/tcu4hyh.js"></script>
 		<script>try{Typekit.load({ async: true });}catch(e){}</script>
         <!-- Global site tag (gtag.js) - Google Analytics -->

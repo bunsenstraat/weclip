@@ -250,8 +250,7 @@ class AC_Yoast_SEO_ACF_Content_Analysis {
 		/**
 		 * Disable Pro fields for anything but ACF 5 pro.
 		 *
-		 * - It is not worth supporting the Pro Addons to v4, as Pro users can just switch to v5.
-		 * - ACF v5 FREE on the other hand does not support these fields either.
+		 * - ACF v5 FREE does not support these fields.
 		 */
 		if ( ! defined( 'ACF_PRO' ) || ! ACF_PRO ) {
 

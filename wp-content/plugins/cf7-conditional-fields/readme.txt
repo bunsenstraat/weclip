@@ -1,13 +1,13 @@
-=== Contact Form 7 - Conditional Fields ===
+=== Conditional Fields for Contact Form 7 ===
 Contributors: Jules Colle
-Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=j_colle%40hotmail%2ecom&lc=US&item_name=Jules%20Colle%20%2d%20WP%20plugins%20%2d%20Responsive%20Gallery%20Grid&item_number=rgg&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
+Donate link: https://shop.bdwm.be/contact-form-7-conditional-fields-pro/
 Author: Jules Colle
 Website: http://bdwm.be
 Tags: wordpress, contact form 7, forms, conditional fields
-Requires at least: 4.1
-Tested up to: 5.4.1
-Stable tag: 1.9.4
-Requires PHP: 5.6
+Requires at least: 5.0
+Tested up to: 6.0
+Stable tag: 2.2
+Requires PHP: 7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,11 +24,11 @@ After you have added the field group(s), click Save and go to the "Conditional f
 
 [Follow this tutorial](https://conditional-fields-cf7.bdwm.be/conditional-fields-for-contact-form-7-tutorial/)
 
-== Main/ New features ==
+== Main features ==
 
 = Support for required fields =
 
-Required fields can be used inside hidden groups without causing validation problems.
+Required fields inside hidden groups will never trigger validation errors.
 
 = Hide/show info in emails based on what groups are visible =
 
@@ -56,7 +56,22 @@ Example email:
 
 = Advanced =
 
-Advanced users can code up the conditions as plain text instead of using the select boxes, using the import/export feature.
+Advanced users can code up the conditions as plain text instead of using the select boxes, using the Text View.
+
+== Need more power? ==
+
+Just like WordPress, the power of Contact Form 7 lies in its [rich eco-system of extensions](https://conditional-fields-cf7.bdwm.be/list-of-all-contact-form-7-extensions/) that build on top of it. However, it can be difficult to find a set of complex extensions that work well together.
+
+That's why I created Conditional Fields Pro. It adds some powerful features to Contact form 7 and guarantees that everything will run smoothly with Conditional Fields.
+
+Pro features include:
+
+* Repeatable fields (repeaters)
+* Forms with multiple steps (multistep)
+* Custom conditions with JavaScript functions
+* Additional operators ( greater than, less than, .. )
+
+[Get the PRO version of Conditional Fields for Contact Form 7!](https://conditional-fields-cf7.bdwm.be/contact-form-7-conditional-fields-pro/)
 
 == Installation ==
 
@@ -100,7 +115,151 @@ The conditional fields javascript code is loaded during wp_footer, so a call to 
 1. Conditional fields in action
 2. Defining rules to show/hide groups of input elements in the backend interface
 
+== Upgrade Notice ==
+
+= 2.0 =
+
+Make sure to also update CF7 to the latest version! (Version 2.0 is only compatible with CF7 versions 5.4 and up. Version 1.9.16 is only compatible with CF7 version 5.3.*)
+
+= 2.2 =
+
+Make sure to also update CF7 to the latest version! (Version 2.2 is only compatible with CF7 versions 5.6 and up. Version 2.1.6 is only compatible with CF7 version 5.5.*)
+
+
 == Changelog ==
+
+= 2.2 (2022-06-17) =
+* Make compatibile with Contact Form 7 version 5.6
+
+= 2.1.6 (2022-06-07) =
+* Fix bug: text view cleared after making a change to form code when there are more than 50 conditions.
+
+= 2.1.5 (2022-05-22) =
+* Fully tested with Contact Form 7 version 5.5.6.1
+
+= 2.1.4 (2022-05-16) =
+* It's no longer needed to save the form before adding conditions. Available groups are updated instantaneously after adding/changing them in the form editor.
+* Fix problems when group is named "children" [GH issue 74](https://github.com/pwkip/contact-form-7-conditional-fields/issues/74)
+* Fix problems with unsaved changes notice [GH issue 91](https://github.com/pwkip/contact-form-7-conditional-fields/issues/91)
+* Tested up to WP 6.0
+
+= 2.1.3 (2022-04-18) =
+* check for user_cap 'wpcf7_edit_contact_forms' instead of 'wpcf7_edit_contact_form' in several places. Thanks, [@paybox](https://wordpress.org/support/topic/some-notices-appearing-fix-suggested/)!
+* PRO multistep: make "Next step" and "Previous step" buttons translatable by third party plugins like wpml and loco translate.
+* PRO multistep: show spinner while validating a step.
+* PRO Fix additional disable_on_hide bug with multistep [GH issue 87-4](https://github.com/pwkip/contact-form-7-conditional-fields/issues/87)
+* Replace all occurences of text domain 'contact-form-7' with 'cf7-conditional-fields'
+
+= 2.1.2 (2022-02-23) =
+* Fully tested with Contact Form 7 version 5.5.6
+
+= 2.1.1 (2022-02-14) =
+* Fully tested with Contact Form 7 version 5.5.5
+* Make scroll to success message less annoying. [GH Issue 90](https://github.com/pwkip/contact-form-7-conditional-fields/issues/90)
+* Add extra check to make sure that scroll to success message only happens when the e-mail is sent. [GH Issue 90](https://github.com/pwkip/contact-form-7-conditional-fields/issues/90)
+* PRO: fix disable_on_hide bugs. [GH sssue 87](https://github.com/pwkip/contact-form-7-conditional-fields/issues/87) 
+
+= 2.1 (2022-01-27) =
+* Tested up to wp 5.9
+* Scroll success message into view after successful form submission. [GH Issue 90](https://github.com/pwkip/contact-form-7-conditional-fields/issues/90)
+* Small changes [GH PR 86](https://github.com/pwkip/contact-form-7-conditional-fields/pull/86)
+* Make 'change' event bubble up [GH PR 88](https://github.com/pwkip/contact-form-7-conditional-fields/pull/88)
+
+= 2.0.9 (2022-01-20) =
+* Fully tested with Contact Form 7 version 5.5.4
+
+= 2.0.8 (2021-11-28) =
+* Check how code changes in CF7 related to `wpcf7_contact_form_properties` impact the plugin, and update TODO comments accordingly.
+* Fully tested with Contact Form 7 version 5.5.3
+* Write additional tests for forms loaded via AJAX
+* only show compatibility notices to users with the update_plugins capabilities
+
+= 2.0.7 (2021-10-26) =
+* Fully tested with Contact Form 7 version 5.5.2 (and also make the warning message disappear if all plugins are up to date)
+
+= 2.0.6 (2021-10-26) =
+* Fully tested with Contact Form 7 version 5.5.2
+
+= 2.0.5 (2021-10-13) =
+* Fully tested with Contact Form 7 version 5.5.1
+
+= 2.0.4 (2021-07-19) =
+* Fix issue with required file fields
+* Fully tested with Contact Form 7 version 5.4.2
+
+= 2.0.3 (2021-05-02) =
+* Fully tested with Contact Form 7 version 5.4.1
+* (dev note: fixed automated tests)
+
+= 2.0.2 (2021-04-06) =
+* Fix bug: third-party required fields not triggering validation. Thanks [@dedotombo](https://wordpress.org/support/topic/bugfix-skip_validation_for_hidden_fields-issue/)!
+
+= 2.0.1 (2021-03-31) =
+* Force height:auto on groups. (Fixes regression errors with groups inside repeaters)
+* Allow more funky characters as conditional fields values (there was a problem with less than sign <)
+* Fix bug with hidden required file and multifile fields causing validation errors
+* Implemented extra tests so these errors cannot reoccur in future updates.
+
+= 2.0 (2021-03-29) =
+* WARNING! 2.0 requires at least Contact Form 7 version 5.4 to work!
+* Make plugin compatible with CF7 5.4
+* Modify wpcf7cf_generate_summary function, so it can be used without $_POST
+* fix animaton when showing group
+
+= 1.9.16 (2021-03-09) =
+* Make notice dismissable
+
+= 1.9.15 (2021-03-03) =
+* PRO: add [disable_on_hide](https://conditional-fields-cf7.bdwm.be/disable_on_hide/) attribute, which allows using multiple fields with the same name.
+* Make plugin translatable. Big thanks to Yordan Soares for the [PR](https://github.com/pwkip/contact-form-7-conditional-fields/pull/73) 
+* Fix [PHP Error if all mails are disabled](https://github.com/pwkip/contact-form-7-conditional-fields/issues/68)
+* PRO: Fix [rename $settings to $wpcf7cf_settings](https://github.com/pwkip/contact-form-7-conditional-fields/issues/75)
+* Compatibility with [CF7 Smart-grid layout plugin](https://wordpress.org/support/topic/rule-sets-only-saving-when-in-text-mode/)
+* Added global variable WPCF7CF_CF7_MAX_VERSION to indicate latest version of CF7 that was succesfully tested with this plugin.
+* Show notice in admin if the current CF7 version is anything other than WPCF7CF_CF7_MAX_VERSION
+
+= 1.9.14 (2020-10-03) =
+* PRO:Repeater: Hide Remove button initially when repeater has min:0
+* PRO:Multistep: Disable Next button while validating step.
+* IE11 compat: Fix classList bug (occured in IE11 if form contained SVG elements)
+
+= 1.9.13 (2020-09-28) =
+* IE11 compatibility: Add Array.from polyfill
+
+= 1.9.12 (2020-09-24) =
+* PRO:Multistep: add new event 'wpcf7cf_step_invalid', triggered after step validation failed. [Example usage](https://conditional-fields-cf7.bdwm.be/multistep-automatically-scroll-to-the-first-invalid-field/)
+* PRO:Multifile: Fix bug where multifle* was not sending attachments
+
+= 1.9.11 (2020-09-07) =
+* PRO:Repeater: Fix bug [group inside repeater not visible when shown by default #64](https://github.com/pwkip/contact-form-7-conditional-fields/issues/64)
+* PRO:Multifile: Add new tag: [multifile]. Allows to upload multiple files at once.
+* PRO:Repeater: Fix bug that occured when removing sub-repeater before the animation of the previous removal was finished.
+* PRO:Repeater: Introduce global JS API function [wpcf7cf.repeaterAddSub](https://conditional-fields-cf7.bdwm.be/docs/javascript-api/wpcf7cf-repeateraddsub/)
+* PRO:Repeater: Introduce global JS API function [wpcf7cf.repeaterAddSubAtIndex](https://conditional-fields-cf7.bdwm.be/docs/javascript-api/wpcf7cf-repeateraddsubatindex/)
+* PRO:Repeater: Introduce global JS API function [wpcf7cf.repeaterRemoveSub](https://conditional-fields-cf7.bdwm.be/docs/javascript-api/wpcf7cf-repeaterremovesub/)
+* PRO:Repeater: Introduce global JS API function [wpcf7cf.repeaterRemoveSubAtIndex](https://conditional-fields-cf7.bdwm.be/docs/javascript-api/wpcf7cf-repeaterremovesubatindex/)
+* PRO:Multistep: Introduce global JS API function [wpcf7cf.multistepMoveToStep](https://conditional-fields-cf7.bdwm.be/docs/javascript-api/multistepmovetostep/)
+* PRO:Multistep: Introduce global JS API function [wpcf7cf.multistepMoveToStepWithValidation](https://conditional-fields-cf7.bdwm.be/docs/javascript-api/multistepmovetostepwithvalidation/)
+
+= 1.9.10 (2020-08-19) =
+* PRO: Fix multistep bug: general error message does not appear if step validation fails
+
+= 1.9.9 (2020-07-29) =
+* Fix bug when saving conditions from Text View
+* Tested with WP 5.5
+
+= 1.9.8 (2020-07-20) =
+* Make sure all posted data is analyzed after submitting (part of) a form. A recent update of CF7 stripped away some information, resulting in PHP Notices.
+
+= 1.9.7 (2020-07-07) =
+* fix IE11 compatibility
+
+= 1.9.6 (2020-07-04) =
+* PRO: Fixed bug: checkboxes and multiselect validation not working inside repeater
+
+= 1.9.5 (2020-07-01) =
+* PRO: Fixed bug: multistep forms interference with other forms after calling wpcf7cf.initForm()
+* PRO: Fixed bug: function operator no longer working.
 
 = 1.9.4 (2020-06-23) =
 * Fixed bug: JS error when conditonal fields settings where not saved manually by the user.

@@ -64,7 +64,7 @@ class Yoast_SEO_Dependency_Test extends TestCase {
 	 * @return void
 	 */
 	public function testPass() {
-		\define( 'WPSEO_VERSION', '4.0.0' );
+		\define( 'WPSEO_VERSION', '14.9.0' );
 
 		$testee = new Yoast_ACF_Analysis_Dependency_Yoast_SEO();
 		$this->assertTrue( $testee->is_met() );
@@ -76,7 +76,7 @@ class Yoast_SEO_Dependency_Test extends TestCase {
 	 * @return void
 	 */
 	public function testOldVersion() {
-		\define( 'WPSEO_VERSION', '2.0.0' );
+		\define( 'WPSEO_VERSION', '14.5.0' );
 
 		$testee = new Yoast_ACF_Analysis_Dependency_Yoast_SEO();
 		$this->assertFalse( $testee->is_met() );

@@ -1,19 +1,14 @@
 <?php
-/**
- * Author watcher to save the meta data to an Indexable.
- *
- * @package Yoast\YoastSEO\Watchers
- */
 
 namespace Yoast\WP\SEO\Integrations\Watchers;
 
-use Yoast\WP\SEO\Conditionals\Migrations_Conditional;
 use Yoast\WP\SEO\Builders\Indexable_Builder;
+use Yoast\WP\SEO\Conditionals\Migrations_Conditional;
 use Yoast\WP\SEO\Integrations\Integration_Interface;
 use Yoast\WP\SEO\Repositories\Indexable_Repository;
 
 /**
- * Watches an Author to save the meta information when updated.
+ * Watches an Author to save the meta information to an Indexable when updated.
  */
 class Indexable_Author_Watcher implements Integration_Interface {
 
@@ -32,7 +27,9 @@ class Indexable_Author_Watcher implements Integration_Interface {
 	protected $builder;
 
 	/**
-	 * @inheritDoc
+	 * Returns the conditionals based on which this loadable should be active.
+	 *
+	 * @return array
 	 */
 	public static function get_conditionals() {
 		return [ Migrations_Conditional::class ];
@@ -50,7 +47,9 @@ class Indexable_Author_Watcher implements Integration_Interface {
 	}
 
 	/**
-	 * @inheritDoc
+	 * Initializes the integration.
+	 *
+	 * This is the place to register hooks and filters.
 	 */
 	public function register_hooks() {
 		\add_action( 'user_register', [ $this, 'build_indexable' ], \PHP_INT_MAX );
@@ -84,6 +83,11 @@ class Indexable_Author_Watcher implements Integration_Interface {
 	 */
 	public function build_indexable( $user_id ) {
 		$indexable = $this->repository->find_by_id_and_type( $user_id, 'user', false );
-		$this->builder->build_for_id_and_type( $user_id, 'user', $indexable );
+		$indexable = $this->builder->build_for_id_and_type( $user_id, 'user', $indexable );
+
+		if ( $indexable ) {
+			$indexable->object_last_modified = \max( $indexable->object_last_modified, \current_time( 'mysql' ) );
+			$indexable->save();
+		}
 	}
 }

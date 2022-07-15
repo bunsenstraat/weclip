@@ -8,7 +8,7 @@
                 <span><a href="mailto:info@weclip.nl">info@weclip.nl</a></span>
             </div>
             <div class="contactBlock tel">
-                <span>030 7857 045</span>
+                <span>+31 6 24 556 992<br></span>
             </div>
             <div class="contactBlock menu">
                 <div id="site-navigation" class="main-navigation" role="navigation">

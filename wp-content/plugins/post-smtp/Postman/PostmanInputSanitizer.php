@@ -20,6 +20,11 @@ if ( ! class_exists( 'PostmanInputSanitizer' ) ) {
 		 *        	Contains all settings fields as array keys
 		 */
 		public function sanitize( $input ) {
+			
+		    if ( array_key_exists( 'external_option', $input ) ) {
+		        return $input;
+            }
+
 			$this->logger->debug( 'Sanitizing data before storage' );
 
 			$new_input = array();
@@ -52,6 +57,7 @@ if ( ! class_exists( 'PostmanInputSanitizer' ) ) {
 			$this->sanitizePassword( 'Password', PostmanOptions::BASIC_AUTH_PASSWORD, $input, $new_input, $this->options->getPassword() );
 			$this->sanitizePassword( 'Mandrill API Key', PostmanOptions::MANDRILL_API_KEY, $input, $new_input, $this->options->getMandrillApiKey() );
 			$this->sanitizePassword( 'SendGrid API Key', PostmanOptions::SENDGRID_API_KEY, $input, $new_input, $this->options->getSendGridApiKey() );
+			$this->sanitizePassword( 'Sendinblue API Key', PostmanOptions::SENDINBLUE_API_KEY, $input, $new_input, $this->options->getSendinblueApiKey() );
 			$this->sanitizePassword( 'Mailgun API Key', PostmanOptions::MAILGUN_API_KEY, $input, $new_input, $this->options->getMailgunApiKey() );
 			$this->sanitizeString( 'Mailgun Domain Name', PostmanOptions::MAILGUN_DOMAIN_NAME, $input, $new_input );
 			$this->sanitizeString( 'Reply-To', PostmanOptions::REPLY_TO, $input, $new_input );
@@ -124,6 +130,7 @@ if ( ! class_exists( 'PostmanInputSanitizer' ) ) {
 		 * @param mixed $new_input
 		 */
 		public function sanitizePassword( $desc, $key, $input, &$new_input, $existingPassword ) {
+
 			// WordPress calling Sanitize twice is a known issue
 			// https://core.trac.wordpress.org/ticket/21989
 			$action = PostmanSession::getInstance()->getAction();

@@ -41,7 +41,7 @@ module.exports = function() {
 		var blocks = wp.data.select( "core/block-editor" ).getBlocks();
 		var blockFields = _.map(
 			_.filter( blocks, function( block ) {
-				return block.name.startsWith( "acf/" ) && block.attributes.mode === "preview";
+				return block.name.startsWith( "acf/" ) && jQuery( `[data-block="${block.clientId}"] .acf-block-preview` ).length === 1;
 			} ),
 			function( block ) {
 				var fieldData = {

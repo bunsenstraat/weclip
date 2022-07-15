@@ -22,7 +22,7 @@ if ( $tool_page === '' ) {
 
 	$tools['import-export'] = [
 		'title' => __( 'Import and Export', 'wordpress-seo' ),
-		'desc'  => __( 'Import settings from other SEO plugins and export your settings for re-use on (another) blog.', 'wordpress-seo' ),
+		'desc'  => __( 'Import settings from other SEO plugins and export your settings for re-use on (another) site.', 'wordpress-seo' ),
 	];
 
 	if ( WPSEO_Utils::allow_system_file_edit() === true && ! is_multisite() ) {
@@ -65,8 +65,6 @@ if ( $tool_page === '' ) {
 	do_action( 'wpseo_tools_overview_list_items' );
 
 	echo '</ul>';
-
-	echo '<input type="hidden" id="wpseo_recalculate_nonce" name="wpseo_recalculate_nonce" value="' . esc_attr( wp_create_nonce( 'wpseo_recalculate' ) ) . '" />';
 }
 else {
 	echo '<a href="', esc_url( admin_url( 'admin.php?page=wpseo_tools' ) ), '">', esc_html__( '&laquo; Back to Tools page', 'wordpress-seo' ), '</a>';

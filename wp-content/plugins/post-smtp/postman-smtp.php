@@ -6,8 +6,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Plugin Name: Post SMTP
  * Plugin URI: https://wordpress.org/plugins/post-smtp/
  * Description: Email not reliable? Post SMTP is the first and only WordPress SMTP plugin to implement OAuth 2.0 for Gmail, Hotmail and Yahoo Mail. Setup is a breeze with the Configuration Wizard and integrated Port Tester. Enjoy worry-free delivery even if your password changes!
- * Version: 2.0.12
- * Author: Yehuda Hassine
+ * Version: 2.1.3
+ * Author: Post SMTP
  * Text Domain: post-smtp
  * Author URI: https://postmansmtp.com
  * License: GPLv2 or later
@@ -27,6 +27,45 @@ if ( ! defined( 'ABSPATH' ) ) {
 // filter postman_module: implement this filter and return the instance of the module
 // filter postman_register_modules: apply this filter to register the module
 
+/** 
+ * Freemius initialization
+ * 
+ * @since 2.1.1
+ * @version 1.0
+ */
+if ( ! function_exists( 'ps_fs' ) ) {
+    // Create a helper function for easy SDK access.
+    function ps_fs() {
+        global $ps_fs;
+
+        if ( ! isset( $ps_fs ) ) {
+            // Include Freemius SDK.
+            require_once dirname(__FILE__) . '/freemius/start.php';
+
+            $ps_fs = fs_dynamic_init( array(
+                'id'                  => '10461',
+                'slug'                => 'post-smtp',
+                'type'                => 'plugin',
+                'public_key'          => 'pk_28fcefa3d0ae86f8cdf6b7f71c0cc',
+                'is_premium'          => false,
+                'has_addons'          => true,
+                'has_paid_plans'      => false,
+                'menu'                => array(
+                    'slug'           => 'postman',
+                    'first-path'     => 'admin.php?page=postman',
+                    'account'        => false,
+                ),
+            ) );
+        }
+
+        return $ps_fs;
+    }
+
+    // Init Freemius.
+    ps_fs();
+    // Signal that SDK was initiated.
+    do_action( 'ps_fs_loaded' );
+}
 
 /**
  * DO some check and Start Postman
@@ -35,10 +74,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'POST_SMTP_BASE', __FILE__ );
 define( 'POST_SMTP_PATH', __DIR__ );
 define( 'POST_SMTP_URL', plugins_url('', POST_SMTP_BASE ) );
-define( 'POST_SMTP_VER', '2.0.12' );
-define( 'POST_SMTP_SHOW_RELEASE_MESSAGE', true );
-define( 'POST_SMTP_RELEASE_MESSAGE', "I have released a new Google Analytics AIO plugin, if you liked it please leave a review." );
-define( 'POST_SMTP_RELEASE_URL', 'https://wordpress.org/plugins/metrics-query/' );
+define( 'POST_SMTP_VER', '2.1.3' );
+define( 'POST_SMTP_ASSETS', plugin_dir_url( __FILE__ ) . 'assets/' );
 
 $postman_smtp_exist = in_array( 'postman-smtp/postman-smtp.php', (array) get_option( 'active_plugins', array() ) );
 $required_php_version = version_compare( PHP_VERSION, '5.6.0', '<' );
@@ -111,6 +148,10 @@ function post_dismiss_not_configured() {
 add_action( 'admin_footer', 'post_dismiss_not_configured' );
 
 function post_smtp_general_scripts() {
+    $localize = include( POST_SMTP_PATH . '/Postman/Localize.php' );
+    wp_register_script( 'post-smtp-localize', POST_SMTP_URL . '/script/localize.js', [], false );
+    wp_localize_script( 'post-smtp-localize', 'post_smtp_localize', $localize );
+    wp_enqueue_script( 'post-smtp-localize' );
     wp_enqueue_script( 'post-smtp-hooks', POST_SMTP_URL . '/script/post-smtp-hooks.js', [], false );
 }
 add_action( 'admin_enqueue_scripts', 'post_smtp_general_scripts', 8 );
@@ -133,4 +174,3 @@ function post_setupPostman() {
 	$kevinCostner = new Postman( __FILE__, POST_SMTP_VER );
 	do_action( 'post_smtp_init');
 }
-

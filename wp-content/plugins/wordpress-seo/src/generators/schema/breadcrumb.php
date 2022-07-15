@@ -1,9 +1,4 @@
 <?php
-/**
- * WPSEO plugin file.
- *
- * @package Yoast\WP\SEO\Generators\Schema
- */
 
 namespace Yoast\WP\SEO\Generators\Schema;
 
@@ -24,15 +19,7 @@ class Breadcrumb extends Abstract_Schema_Piece {
 			return false;
 		}
 
-		if ( $this->context->indexable->object_type === 'home-page' || $this->helpers->current_page->is_home_static_page() ) {
-			return false;
-		}
-
-		if ( $this->context->breadcrumbs_enabled ) {
-			return true;
-		}
-
-		return false;
+		return true;
 	}
 
 	/**
@@ -45,6 +32,21 @@ class Breadcrumb extends Abstract_Schema_Piece {
 	public function generate() {
 		$breadcrumbs   = $this->context->presentation->breadcrumbs;
 		$list_elements = [];
+
+		// In case of pagination, replace the last breadcrumb, because it only contains "Page [number]" and has no URL.
+		if (
+			(
+				$this->helpers->current_page->is_paged()
+				|| $this->context->indexable->number_of_pages > 1
+			) && (
+				// Do not replace the last breadcrumb on static post pages.
+				! $this->helpers->current_page->is_static_posts_page()
+				// Do not remove the last breadcrumb if only one exists (bugfix for custom paginated frontpages).
+				&& \count( $breadcrumbs ) > 1
+			)
+		) {
+			\array_pop( $breadcrumbs );
+		}
 
 		// Only output breadcrumbs that are not hidden.
 		$breadcrumbs = \array_filter( $breadcrumbs, [ $this, 'not_hidden' ] );
@@ -61,17 +63,23 @@ class Breadcrumb extends Abstract_Schema_Piece {
 			}
 		}
 
-
 		// Create the last breadcrumb.
 		$last_breadcrumb = \array_pop( $breadcrumbs );
 		$breadcrumbs[]   = $this->format_last_breadcrumb( $last_breadcrumb );
 
-		// Add a paginated state if the current page is paged.
-		if ( $this->helpers->current_page->is_paged() ) {
-			$breadcrumbs[] = [
-				'url'  => $this->context->canonical,
-				'text' => $this->context->title,
-			];
+		// If this is a static front page, prevent nested pages from creating a trail.
+		if ( $this->helpers->current_page->is_home_static_page() ) {
+
+			// Check if we're dealing with a nested page.
+			if ( \count( $breadcrumbs ) > 1 ) {
+
+				// Store the breadcrumbs home variable before dropping the parent page from the Schema.
+				$breadcrumbs_home = $breadcrumbs[0]['text'];
+				$breadcrumbs      = [ \array_pop( $breadcrumbs ) ];
+
+				// Make the child page show the breadcrumbs home variable rather than its own title.
+				$breadcrumbs[0]['text'] = $breadcrumbs_home;
+			}
 		}
 
 		// Create intermediate breadcrumbs.
@@ -95,49 +103,56 @@ class Breadcrumb extends Abstract_Schema_Piece {
 	 * @return array A breadcrumb listItem.
 	 */
 	private function create_breadcrumb( $index, $breadcrumb ) {
-		return [
+		$crumb = [
 			'@type'    => 'ListItem',
 			'position' => ( $index + 1 ),
-			'item'     => [
-				'@type' => 'WebPage',
-				'@id'   => $breadcrumb['url'],
-				'url'   => $breadcrumb['url'], // For future proofing, we're trying to change the standard for this.
-				'name'  => $this->helpers->schema->html->smart_strip_tags( $breadcrumb['text'] ),
-			],
+			'name'     => $this->helpers->schema->html->smart_strip_tags( $breadcrumb['text'] ),
 		];
+
+		if ( ! empty( $breadcrumb['url'] ) ) {
+			$crumb['item'] = $breadcrumb['url'];
+		}
+
+		return $crumb;
 	}
 
 	/**
-	 * Creates the last breadcrumb in the breadcrumb list.
-	 * Provides a fallback for the URL and text:
-	 *  - URL falls back to the canonical of current page.
-	 *  - text falls back to the title of current page.
+	 * Creates the last breadcrumb in the breadcrumb list, omitting the URL per Google's spec.
+	 *
+	 * @link https://developers.google.com/search/docs/data-types/breadcrumb
 	 *
 	 * @param array $breadcrumb The position in the list.
 	 *
 	 * @return array The last of the breadcrumbs.
 	 */
 	private function format_last_breadcrumb( $breadcrumb ) {
-		if ( empty( $breadcrumb['url'] ) ) {
-			$breadcrumb['url'] = $this->context->canonical;
-		}
-		if ( empty( $breadcrumb['text'] ) ) {
-			$breadcrumb['text'] = $this->helpers->schema->html->smart_strip_tags( $this->context->title );
-		}
+		unset( $breadcrumb['url'] );
 
 		return $breadcrumb;
 	}
 
 	/**
 	 * Tests if the breadcrumb is broken.
-	 * A breadcrumb is considered broken when it has no URL or text.
+	 * A breadcrumb is considered broken:
+	 * - when it is not an array.
+	 * - when it has no URL or text.
 	 *
 	 * @param array $breadcrumb The breadcrumb to test.
 	 *
 	 * @return bool `true` if the breadcrumb is broken.
 	 */
 	private function is_broken( $breadcrumb ) {
-		return ! \array_key_exists( 'url', $breadcrumb ) || ! \array_key_exists( 'text', $breadcrumb );
+		// A breadcrumb is broken if it is not an array.
+		if ( ! \is_array( $breadcrumb ) ) {
+			return true;
+		}
+
+		// A breadcrumb is broken if it does not contain a URL or text.
+		if ( ! \array_key_exists( 'url', $breadcrumb ) || ! \array_key_exists( 'text', $breadcrumb ) ) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**

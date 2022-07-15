@@ -7,8 +7,8 @@ use Brain\Monkey\Filters;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;
 use Yoast_ACF_Analysis_Configuration;
-use Yoast_ACF_Analysis_String_Store;
 use Yoast_ACF_Analysis_Facade;
+use Yoast_ACF_Analysis_String_Store;
 
 /**
  * Class Configuration_Test.

@@ -528,9 +528,9 @@ class WPSEO_Post_Watcher extends WPSEO_Watcher implements WPSEO_WordPress_Integr
 	 * @return string
 	 */
 	protected function get_delete_notification() {
-		/* translators: %1$s: Yoast SEO Premium, %2$s: List with actions, %3$s: <a href='{post_with_explaination.}'>, %4$s: </a> */
+		/* translators: %1$s: Yoast SEO Premium, %2$s: List with actions, %3$s: <a href='{post_with_explaination.}'>, %4$s: </a>, %5%s: The removed url.  */
 		return __(
-			'%1$s detected that you deleted a post. You can either: %2$s Don\'t know what to do? %3$sRead this post %4$s.',
+			'%1$s detected that you deleted a post (%5$s). You can either: %2$s Don\'t know what to do? %3$sRead this post %4$s.',
 			'wordpress-seo-premium'
 		);
 	}
@@ -563,7 +563,7 @@ class WPSEO_Post_Watcher extends WPSEO_Watcher implements WPSEO_WordPress_Integr
 	 * @return bool True when in an AJAX-request and the action is inline-save.
 	 */
 	protected function is_action_inline_save() {
-		return ( defined( 'DOING_AJAX' ) && DOING_AJAX && $this->get_post_action() === 'inline-save' );
+		return ( wp_doing_ajax() && $this->get_post_action() === 'inline-save' );
 	}
 
 	/**
@@ -602,26 +602,12 @@ class WPSEO_Post_Watcher extends WPSEO_Watcher implements WPSEO_WordPress_Integr
 	 */
 	protected function set_undo_slug_notification( WPSEO_Redirect $redirect ) {
 
-		if ( ! $this->is_rest_request() ) {
+		if ( ! $this->is_rest_request() && ! \wp_doing_ajax() ) {
 			parent::set_undo_slug_notification( $redirect );
 
 			return;
 		}
 
 		header( 'X-Yoast-Redirect-Created: 1; origin=' . $redirect->get_origin() . '; target=' . $redirect->get_target() . '; type=' . $redirect->get_type() );
-	}
-
-	/**
-	 * Add an extra field to post edit screen so we know the old URL in the 'post_updated' hook.
-	 *
-	 * @deprecated 9.1
-	 * @codeCoverageIgnore
-	 *
-	 * @param WP_Post $post The post object to get the ID from.
-	 *
-	 * @return void
-	 */
-	public function old_url_field( $post ) {
-		_deprecated_function( 'WPSEO_Post_Watcher::old_url_field', '9.1' );
 	}
 }

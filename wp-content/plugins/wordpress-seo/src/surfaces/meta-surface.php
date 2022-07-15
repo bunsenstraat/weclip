@@ -1,43 +1,57 @@
 <?php
-/**
- * Surface for the indexables.
- *
- * @package Yoast\YoastSEO\Surfaces
- */
 
 namespace Yoast\WP\SEO\Surfaces;
 
-use Yoast\WP\SEO\Surfaces\Values\Meta;
 use Yoast\WP\SEO\Context\Meta_Tags_Context;
+use Yoast\WP\SEO\Helpers\Indexable_Helper;
 use Yoast\WP\SEO\Memoizers\Meta_Tags_Context_Memoizer;
+use Yoast\WP\SEO\Models\Indexable;
 use Yoast\WP\SEO\Repositories\Indexable_Repository;
+use Yoast\WP\SEO\Surfaces\Values\Meta;
 use Yoast\WP\SEO\Wrappers\WP_Rewrite_Wrapper;
 use YoastSEO_Vendor\Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Meta_Surface class.
+ *
+ * Surface for the indexables.
  */
 class Meta_Surface {
 
 	/**
+	 * The container.
+	 *
 	 * @var ContainerInterface
 	 */
 	private $container;
 
 	/**
+	 * The memoizer for the meta tags context.
+	 *
 	 * @var Meta_Tags_Context_Memoizer
 	 */
 	private $context_memoizer;
 
 	/**
+	 * The indexable repository.
+	 *
 	 * @var Indexable_Repository
 	 */
 	private $repository;
 
 	/**
+	 * Holds the WP rewrite wrapper instance.
+	 *
 	 * @var WP_Rewrite_Wrapper
 	 */
 	private $wp_rewrite_wrapper;
+
+	/**
+	 * The indexable helper.
+	 *
+	 * @var Indexable_Helper
+	 */
+	private $indexable_helper;
 
 	/**
 	 * Meta_Surface constructor.
@@ -46,17 +60,20 @@ class Meta_Surface {
 	 * @param Meta_Tags_Context_Memoizer $context_memoizer     The meta tags context memoizer.
 	 * @param Indexable_Repository       $indexable_repository The indexable repository.
 	 * @param WP_Rewrite_Wrapper         $wp_rewrite_wrapper   The WP rewrite wrapper.
+	 * @param Indexable_Helper           $indexable_helper     The indexable helper.
 	 */
 	public function __construct(
 		ContainerInterface $container,
 		Meta_Tags_Context_Memoizer $context_memoizer,
 		Indexable_Repository $indexable_repository,
-		WP_Rewrite_Wrapper $wp_rewrite_wrapper
+		WP_Rewrite_Wrapper $wp_rewrite_wrapper,
+		Indexable_Helper $indexable_helper
 	) {
 		$this->container          = $container;
 		$this->context_memoizer   = $context_memoizer;
 		$this->repository         = $indexable_repository;
 		$this->wp_rewrite_wrapper = $wp_rewrite_wrapper;
+		$this->indexable_helper   = $indexable_helper;
 	}
 
 	/**
@@ -74,7 +91,7 @@ class Meta_Surface {
 	 * @return Meta|false The meta values. False if none could be found.
 	 */
 	public function for_home_page() {
-		$front_page_id = \get_option( 'page_on_front' );
+		$front_page_id = (int) \get_option( 'page_on_front' );
 		if ( \get_option( 'show_on_front' ) === 'page' && $front_page_id !== 0 ) {
 			$indexable = $this->repository->find_by_id_and_type( $front_page_id, 'post' );
 
@@ -124,7 +141,7 @@ class Meta_Surface {
 	/**
 	 * Returns the meta tags context for a post type archive.
 	 *
-	 * @param string $post_type Optional. The post type to get the archive meta for. Defaults to the current post type.
+	 * @param string|null $post_type Optional. The post type to get the archive meta for. Defaults to the current post type.
 	 *
 	 * @return Meta|false The meta values. False if none could be found.
 	 */
@@ -187,8 +204,29 @@ class Meta_Surface {
 			return false;
 		}
 
-
 		return $this->build_meta( $this->context_memoizer->get( $indexable, 'Post_Type' ) );
+	}
+
+	/**
+	 * Returns the meta tags context for a number of posts.
+	 *
+	 * @param int[] $ids The IDs of the posts.
+	 *
+	 * @return Meta[]|false The meta values. False if none could be found.
+	 */
+	public function for_posts( $ids ) {
+		$indexables = $this->repository->find_by_multiple_ids_and_type( $ids, 'post' );
+
+		if ( empty( $indexables ) ) {
+			return false;
+		}
+
+		return \array_map(
+			function( $indexable ) {
+				return $this->build_meta( $this->context_memoizer->get( $indexable, 'Post_Type' ) );
+			},
+			$indexables
+		);
 	}
 
 	/**
@@ -204,7 +242,6 @@ class Meta_Surface {
 		if ( ! $indexable ) {
 			return false;
 		}
-
 
 		return $this->build_meta( $this->context_memoizer->get( $indexable, 'Term_Archive' ) );
 	}
@@ -227,6 +264,43 @@ class Meta_Surface {
 	}
 
 	/**
+	 * Returns the meta for an indexable.
+	 *
+	 * @param Indexable   $indexable The indexable.
+	 * @param string|null $page_type Optional. The page type if already known.
+	 *
+	 * @return Meta|false The meta values. False if none could be found.
+	 */
+	public function for_indexable( $indexable, $page_type = null ) {
+		if ( \is_null( $page_type ) ) {
+			$page_type = $this->indexable_helper->get_page_type_for_indexable( $indexable );
+		}
+
+		return $this->build_meta( $this->context_memoizer->get( $indexable, $page_type ) );
+	}
+
+	/**
+	 * Returns the meta for an indexable.
+	 *
+	 * @param Indexable[] $indexables The indexables.
+	 * @param string|null $page_type  Optional. The page type if already known.
+	 *
+	 * @return Meta|false The meta values. False if none could be found.
+	 */
+	public function for_indexables( $indexables, $page_type = null ) {
+		$closure = function( $indexable ) use ( $page_type ) {
+			$this_page_type = $page_type;
+			if ( \is_null( $this_page_type ) ) {
+				$this_page_type = $this->indexable_helper->get_page_type_for_indexable( $indexable );
+			}
+
+			return $this->build_meta( $this->context_memoizer->get( $indexable, $this_page_type ) );
+		};
+
+		return \array_map( $closure, $indexables );
+	}
+
+	/**
 	 * Returns the meta tags context for a url.
 	 *
 	 * @param string $url The url of the page. Required to be relative to the site url.
@@ -236,6 +310,13 @@ class Meta_Surface {
 	public function for_url( $url ) {
 		$url_parts  = \wp_parse_url( $url );
 		$site_parts = \wp_parse_url( \site_url() );
+
+		if ( ( ! \is_array( $url_parts ) || ! \is_array( $site_parts ) )
+			|| ! isset( $url_parts['host'], $url_parts['path'], $site_parts['host'], $site_parts['scheme'] )
+		) {
+			return false;
+		}
+
 		if ( $url_parts['host'] !== $site_parts['host'] ) {
 			return false;
 		}
@@ -253,47 +334,9 @@ class Meta_Surface {
 		if ( ! $indexable ) {
 			return false;
 		}
-		$page_type = '';
+		$page_type = $this->indexable_helper->get_page_type_for_indexable( $indexable );
 
-		switch ( $indexable->object_type ) {
-			case 'post':
-				$front_page_id = (int) \get_option( 'page_on_front' );
-				if ( $indexable->object_id === $front_page_id ) {
-					$page_type = 'Static_Home_Page';
-					break;
-				}
-				$posts_page_id = (int) \get_option( 'page_for_posts' );
-				if ( $indexable->object_id === $posts_page_id ) {
-					$page_type = 'Static_Posts_Page';
-					break;
-				}
-				$page_type = 'Post_Type';
-				break;
-			case 'term':
-				$page_type = 'Term_Archive';
-				break;
-			case 'user':
-				$page_type = 'Author_Archive';
-				break;
-			case 'home-page':
-				$page_type = 'Home_Page';
-				break;
-			case 'post-type-archive':
-				$page_type = 'Post_Type_Archive';
-				break;
-			case 'date-archive':
-				$page_type = 'Date_Archive';
-				break;
-			case 'system-page':
-				if ( $indexable->object_sub_type === 'search-result' ) {
-					$page_type = 'Search_Result_Page';
-				}
-				if ( $indexable->object_sub_type === '404' ) {
-					$page_type = 'Error_Page';
-				}
-		}
-
-		if ( empty( $page_type ) ) {
+		if ( $page_type === false ) {
 			return false;
 		}
 
@@ -305,12 +348,15 @@ class Meta_Surface {
 	 *
 	 * @param string $url The url.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	protected function is_date_archive_url( $url ) {
 		$path = \wp_parse_url( $url, \PHP_URL_PATH );
-		$path = \ltrim( $path, '/' );
+		if ( $path === null ) {
+			return false;
+		}
 
+		$path         = \ltrim( $path, '/' );
 		$wp_rewrite   = $this->wp_rewrite_wrapper->get();
 		$date_rewrite = $wp_rewrite->generate_rewrite_rules( $wp_rewrite->get_date_permastruct(), \EP_DATE );
 		$date_rewrite = \apply_filters( 'date_rewrite_rules', $date_rewrite );

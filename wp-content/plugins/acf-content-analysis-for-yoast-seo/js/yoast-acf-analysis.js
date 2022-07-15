@@ -1,5 +1,5 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-/* global YoastSEO, acf, _, jQuery, wp */
+/* global YoastSEO, acf, jQuery, */
 var config = require( "./config/config.js" );
 var helper = require( "./helper.js" );
 var collect = require( "./collect/collect.js" );
@@ -16,36 +16,6 @@ var App = function() {
 };
 
 /**
- * ACF 4 Listener.
- *
- * @param {Array} fieldSelectors List of field selectors.
- * @param {string} wysiwygSelector Element selector for WYSIWYG fields.
- * @param {Array} fieldSelectorsWithoutWysiwyg List of fields.
- *
- * @returns {void}
- */
-App.prototype.acf4Listener = function( fieldSelectors, wysiwygSelector, fieldSelectorsWithoutWysiwyg ) {
-	replaceVars.updateReplaceVars( collect );
-
-	var fieldsWithoutWysiwyg = jQuery( "#post-body, #edittag" ).find( fieldSelectorsWithoutWysiwyg.join( "," ) );
-	var fields = jQuery( "#post-body, #edittag" ).find( fieldSelectors.join( "," ) );
-
-	fieldsWithoutWysiwyg.on( "change", this.maybeRefresh.bind( this ) );
-	// Do not ignore Wysiwyg fields for the purpose of Replace Vars.
-	fields.on( "change", replaceVars.updateReplaceVars.bind( this, collect ) );
-
-	if ( YoastSEO.wp._tinyMCEHelper ) {
-		jQuery( wysiwygSelector ).each( function() {
-			YoastSEO.wp._tinyMCEHelper.addEventHandler( this.id, [ "input", "change", "cut", "paste" ],
-				replaceVars.updateReplaceVars.bind( this, collect ) );
-		} );
-	}
-
-	// Also refresh on media close as attachment data might have changed
-	wp.media.frame.on( "close", this.maybeRefresh );
-};
-
-/**
  * ACF 5 Listener.
  *
  * @returns {void}
@@ -53,21 +23,58 @@ App.prototype.acf4Listener = function( fieldSelectors, wysiwygSelector, fieldSel
 App.prototype.acf5Listener = function() {
 	replaceVars.updateReplaceVars( collect );
 
-	acf.add_action( "change remove append sortstop", this.maybeRefresh );
-	acf.add_action( "change remove append sortstop", replaceVars.updateReplaceVars.bind( this, collect ) );
+	var that = this;
+
+	// Use ACF Models introduced in ACF version 5.7.
+	/* eslint-disable no-unused-vars */
+	var acfModelInstance = new acf.Model( {
+		wait: "ready",
+		events: {
+			input: "onInput",
+		},
+		onInput: this.refreshAnalysisAndReplaceVars.bind( this ),
+	} );
+	/* eslint-enable no-unused-vars */
+
+	// The ACF Wysiwyg field needs to be handled after TinyMCE is initialized.
+	jQuery( document ).on( "tinymce-editor-init", function( event, editor ) {
+		/*
+		 * TinyMCE supports the native `input` event but doesn't always fire it
+		 * when pasting: added a specific `paste` event. Also, added TinyMCE specific
+		 * events to support the undo and redo actions.
+		 */
+		editor.on( "input paste undo redo", function() {
+			that.refreshAnalysisAndReplaceVars();
+		} );
+	} );
+
+	/*
+	 * ACF `append` global action: Triggered when new HTML is added to the page.
+	 * For example, when adding a Repeater row or a Flexible content layout.
+	 */
+	acf.addAction( "append", this.refreshAnalysisAndReplaceVars.bind( this ) );
+
+	/*
+	 * ACF `remove` global action: Triggered when HTML is removed from the page.
+	 * For example, when removing a Repeater row or a Flexible content layout.
+	 */
+	acf.addAction( "remove", this.refreshAnalysisAndReplaceVars.bind( this ) );
+
+	/*
+	 * ACF `sortstop` global action: Triggered when a field is reordered.
+	 * For example, when reordering Repeater rows or Flexible content layouts.
+	 */
+	acf.addAction( "sortstop", this.refreshAnalysisAndReplaceVars.bind( this ) );
+};
+
+App.prototype.refreshAnalysisAndReplaceVars = function() {
+	this.maybeRefresh();
+	replaceVars.updateReplaceVars.bind( this, collect );
 };
 
 App.prototype.bindListeners = function() {
 	if ( helper.acf_version >= 5 ) {
 		jQuery( this.acf5Listener.bind( this ) );
-	} else {
-		var fieldSelectors = config.fieldSelectors.slice( 0 );
-		var wysiwygSelector = "textarea[id^=wysiwyg-acf]";
-
-		// Ignore Wysiwyg fields because they trigger a refresh in Yoast SEO itself
-		var fieldSelectorsWithoutWysiwyg = _.without( fieldSelectors, wysiwygSelector );
-
-		jQuery( document ).on( "acf/setup_fields", this.acf4Listener.bind( this, fieldSelectors, wysiwygSelector, fieldSelectorsWithoutWysiwyg ) );
 	}
 };
 
@@ -78,7 +85,9 @@ App.prototype.maybeRefresh = function() {
 
 	analysisTimeout = window.setTimeout( function() {
 		if ( config.debug ) {
+			/* eslint-disable no-console */
 			console.log( "Recalculate..." + new Date() + "(Internal)" );
+			/* eslint-enable no-console */
 		}
 
 		YoastSEO.app.pluginReloaded( config.pluginName );
@@ -87,7 +96,7 @@ App.prototype.maybeRefresh = function() {
 
 module.exports = App;
 
-},{"./collect/collect.js":6,"./config/config.js":7,"./helper.js":8,"./replacevars.js":10}],2:[function(require,module,exports){
+},{"./collect/collect.js":5,"./config/config.js":6,"./helper.js":7,"./replacevars.js":9}],2:[function(require,module,exports){
 /* global _ */
 var cache = require( "./cache.js" );
 
@@ -190,30 +199,6 @@ Cache.prototype.clear =  function( store ) {
 module.exports = new Cache();
 
 },{}],4:[function(require,module,exports){
-/* global jQuery */
-
-var config = require( "./../config/config.js" );
-var fieldSelectors = config.fieldSelectors;
-
-var field_data = [];
-
-var fields = jQuery( "#post-body, #edittag" ).find( fieldSelectors.join( "," ) );
-
-fields.each( function() {
-	var $el = jQuery( this ).parents( ".field" ).last();
-
-	field_data.push( {
-		$el: $el,
-		key: $el.data( "field_key" ),
-		name: $el.data( "field_name" ),
-		type: $el.data( "field_type" ),
-		post_meta_key: $el.data( "field_name" ),
-	} );
-} );
-
-module.exports = field_data;
-
-},{"./../config/config.js":7}],5:[function(require,module,exports){
 /* global _, acf, jQuery, wp */
 module.exports = function() {
 	var outerFieldsName = [
@@ -257,7 +242,7 @@ module.exports = function() {
 		var blocks = wp.data.select( "core/block-editor" ).getBlocks();
 		var blockFields = _.map(
 			_.filter( blocks, function( block ) {
-				return block.name.startsWith( "acf/" ) && block.attributes.mode === "preview";
+				return block.name.startsWith( "acf/" ) && jQuery( `[data-block="${block.clientId}"] .acf-block-preview` ).length === 1;
 			} ),
 			function( block ) {
 				var fieldData = {
@@ -302,7 +287,7 @@ module.exports = function() {
 	return fields;
 };
 
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 /* global _ */
 
 var config = require( "./../config/config.js" );
@@ -362,7 +347,6 @@ Collect.prototype.getData = function() {
 	if ( helper.acf_version >= 5 ) {
 		return require( "./collect-v5.js" )();
 	}
-	return require( "./collect-v4.js" );
 };
 
 Collect.prototype.filterBlacklistType = function( field_data ) {
@@ -399,32 +383,43 @@ Collect.prototype.sort = function( field_data ) {
 
 module.exports = new Collect();
 
-},{"./../config/config.js":7,"./../helper.js":8,"./../scraper-store.js":11,"./collect-v4.js":4,"./collect-v5.js":5}],7:[function(require,module,exports){
+},{"./../config/config.js":6,"./../helper.js":7,"./../scraper-store.js":10,"./collect-v5.js":4}],6:[function(require,module,exports){
 /* globals YoastACFAnalysisConfig */
 module.exports = YoastACFAnalysisConfig;
 
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 var config = require( "./config/config.js" );
 
 module.exports = {
 	acf_version: parseFloat( config.acfVersion, 10 ),
 };
 
-},{"./config/config.js":7}],9:[function(require,module,exports){
-/* global jQuery, YoastSEO, YoastACFAnalysis: true */
+},{"./config/config.js":6}],8:[function(require,module,exports){
+/* global jQuery, YoastSEO, wp, YoastACFAnalysis: true */
 /* exported YoastACFAnalysis */
 
-var App = require( "./app.js" );
+const App = require( "./app.js" );
 
-( function( $ ) {
-	$( document ).ready( function() {
-		if ( "undefined" !== typeof YoastSEO ) {
-			YoastACFAnalysis = new App();
-		}
-	} );
-}( jQuery ) );
+/**
+ * Initializes the YoastACFAnalysis app.
+ *
+ * @returns {void}
+ */
+function initializeYoastACFAnalysis() {
+	YoastACFAnalysis = new App();
+}
 
-},{"./app.js":1}],10:[function(require,module,exports){
+wp.domReady( function() {
+	if ( ! ( YoastSEO && YoastSEO.app ) ) {
+		// Give it one more attempt in 100ms.
+		setTimeout( initializeYoastACFAnalysis, 100 );
+		return;
+	}
+
+	initializeYoastACFAnalysis();
+} );
+
+},{"./app.js":1}],9:[function(require,module,exports){
 /* global _, jQuery, YoastSEO, YoastReplaceVarPlugin */
 
 var config = require( "./config/config.js" );
@@ -481,7 +476,7 @@ module.exports = {
 	updateReplaceVars: updateReplaceVars,
 };
 
-},{"./config/config.js":7}],11:[function(require,module,exports){
+},{"./config/config.js":6}],10:[function(require,module,exports){
 var config = require( "./config/config.js" );
 
 var scraperObjects = {
@@ -579,7 +574,7 @@ module.exports = {
 	getScraper: getScraper,
 };
 
-},{"./config/config.js":7,"./scraper/scraper.block_preview.js":12,"./scraper/scraper.email.js":13,"./scraper/scraper.gallery.js":14,"./scraper/scraper.image.js":15,"./scraper/scraper.link.js":16,"./scraper/scraper.taxonomy.js":17,"./scraper/scraper.text.js":18,"./scraper/scraper.textarea.js":19,"./scraper/scraper.url.js":20,"./scraper/scraper.wysiwyg.js":21}],12:[function(require,module,exports){
+},{"./config/config.js":6,"./scraper/scraper.block_preview.js":11,"./scraper/scraper.email.js":12,"./scraper/scraper.gallery.js":13,"./scraper/scraper.image.js":14,"./scraper/scraper.link.js":15,"./scraper/scraper.taxonomy.js":16,"./scraper/scraper.text.js":17,"./scraper/scraper.textarea.js":18,"./scraper/scraper.url.js":19,"./scraper/scraper.wysiwyg.js":20}],11:[function(require,module,exports){
 /* global _ */
 
 var Scraper = function() {};
@@ -600,7 +595,7 @@ Scraper.prototype.scrape = function( fields ) {
 
 module.exports = Scraper;
 
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 /* global _ */
 
 var Scraper = function() {};
@@ -621,7 +616,7 @@ Scraper.prototype.scrape = function( fields ) {
 
 module.exports = Scraper;
 
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 /* global _, jQuery */
 
 var attachmentCache = require( "./../cache/cache.attachments.js" );
@@ -663,7 +658,7 @@ Scraper.prototype.scrape = function( fields ) {
 
 module.exports = Scraper;
 
-},{"./../cache/cache.attachments.js":2}],15:[function(require,module,exports){
+},{"./../cache/cache.attachments.js":2}],14:[function(require,module,exports){
 /* global _ */
 
 var attachmentCache = require( "./../cache/cache.attachments.js" );
@@ -701,7 +696,7 @@ Scraper.prototype.scrape = function( fields ) {
 
 module.exports = Scraper;
 
-},{"./../cache/cache.attachments.js":2}],16:[function(require,module,exports){
+},{"./../cache/cache.attachments.js":2}],15:[function(require,module,exports){
 /* global _ */
 require( "./../scraper-store.js" );
 
@@ -736,7 +731,7 @@ Scraper.prototype.scrape = function( fields ) {
 
 module.exports = Scraper;
 
-},{"./../scraper-store.js":11}],17:[function(require,module,exports){
+},{"./../scraper-store.js":10}],16:[function(require,module,exports){
 /* global _, acf */
 
 var Scraper = function() {};
@@ -792,7 +787,7 @@ Scraper.prototype.scrape = function( fields ) {
 
 module.exports = Scraper;
 
-},{}],18:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 /* global _ */
 
 var config = require( "./../config/config.js" );
@@ -847,7 +842,7 @@ Scraper.prototype.isHeadline = function( field ) {
 
 module.exports = Scraper;
 
-},{"./../config/config.js":7}],19:[function(require,module,exports){
+},{"./../config/config.js":6}],18:[function(require,module,exports){
 /* global _ */
 
 var Scraper = function() {};
@@ -868,7 +863,7 @@ Scraper.prototype.scrape = function( fields ) {
 
 module.exports = Scraper;
 
-},{}],20:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 /* global _ */
 
 var Scraper = function() {};
@@ -891,7 +886,7 @@ Scraper.prototype.scrape = function( fields ) {
 
 module.exports = Scraper;
 
-},{}],21:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 /* global tinyMCE, _ */
 
 var Scraper = function() {};
@@ -950,4 +945,4 @@ Scraper.prototype.scrape = function( fields ) {
 
 module.exports = Scraper;
 
-},{}]},{},[9]);
+},{}]},{},[8]);

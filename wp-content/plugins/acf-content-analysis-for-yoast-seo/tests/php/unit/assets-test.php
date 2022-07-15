@@ -67,6 +67,6 @@ class Assets_Test extends TestCase {
 		$testee = new Yoast_ACF_Analysis_Assets();
 		$testee->init();
 
-		$this->assertTrue( \has_filter( 'admin_enqueue_scripts', [ $testee, 'enqueue_scripts' ] ) );
+		$this->assertTrue( \has_action( 'admin_enqueue_scripts', [ $testee, 'enqueue_scripts' ] ) );
 	}
 }

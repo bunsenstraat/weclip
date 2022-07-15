@@ -2,11 +2,11 @@
 
 namespace Yoast\WP\ACF\Tests;
 
+use AC_Yoast_SEO_ACF_Content_Analysis;
 use Brain\Monkey;
 use PHPUnit\Framework\TestCase;
-use Yoast_ACF_Analysis_Facade;
-use AC_Yoast_SEO_ACF_Content_Analysis;
 use Yoast_ACF_Analysis_Configuration;
+use Yoast_ACF_Analysis_Facade;
 
 /**
  * Class Main_Test.

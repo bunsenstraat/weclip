@@ -35,12 +35,12 @@ class WPSEO_Admin_Init {
 		$this->asset_manager = new WPSEO_Admin_Asset_Manager();
 
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_dismissible' ] );
-		add_action( 'admin_init', [ $this, 'yoast_plugin_suggestions_notification' ], 15 );
 		add_action( 'admin_init', [ $this, 'unsupported_php_notice' ], 15 );
 		add_action( 'admin_init', [ $this->asset_manager, 'register_assets' ] );
 		add_action( 'admin_init', [ $this, 'show_hook_deprecation_warnings' ] );
 		add_action( 'admin_init', [ 'WPSEO_Plugin_Conflict', 'hook_check_for_plugin_conflicts' ] );
 		add_action( 'admin_notices', [ $this, 'permalink_settings_notice' ] );
+		add_action( 'post_submitbox_misc_actions', [ $this, 'add_publish_box_section' ] );
 
 		/*
 		 * The `admin_notices` hook fires on single site admin pages vs.
@@ -48,19 +48,6 @@ class WPSEO_Admin_Init {
 		 * `user_admin_notices` which fires on multisite user admin pagss.
 		 */
 		add_action( 'admin_notices', [ $this, 'search_engines_discouraged_notice' ] );
-
-		$health_checks = [
-			new WPSEO_Health_Check_Page_Comments(),
-			new WPSEO_Health_Check_Ryte(),
-			new WPSEO_Health_Check_Default_Tagline(),
-			new WPSEO_Health_Check_Postname_Permalink(),
-			new WPSEO_Health_Check_Curl_Version(),
-			new WPSEO_Health_Check_Link_Table_Not_Accessible(),
-		];
-
-		foreach ( $health_checks as $health_check ) {
-			$health_check->register_test();
-		}
 
 		$this->load_meta_boxes();
 		$this->load_taxonomy_class();
@@ -78,59 +65,6 @@ class WPSEO_Admin_Init {
 	}
 
 	/**
-	 * Determines whether a suggested plugins notification needs to be displayed.
-	 *
-	 * @return void
-	 */
-	public function yoast_plugin_suggestions_notification() {
-		$checker             = new WPSEO_Plugin_Availability();
-		$notification_center = Yoast_Notification_Center::get();
-
-		// Get all Yoast plugins that have dependencies.
-		$plugins = $checker->get_plugins_with_dependencies();
-
-		foreach ( $plugins as $plugin_name => $plugin ) {
-			$dependency_names = $checker->get_dependency_names( $plugin );
-			$notification     = $this->get_yoast_seo_suggested_plugins_notification( $plugin_name, $plugin, $dependency_names[0] );
-
-			if ( $checker->dependencies_are_satisfied( $plugin ) && ! $checker->is_installed( $plugin ) ) {
-				$notification_center->add_notification( $notification );
-
-				continue;
-			}
-
-			$notification_center->remove_notification( $notification );
-		}
-	}
-
-	/**
-	 * Build Yoast SEO suggested plugins notification.
-	 *
-	 * @param string $name            The plugin name to use for the unique ID.
-	 * @param array  $plugin          The plugin to retrieve the data from.
-	 * @param string $dependency_name The name of the dependency.
-	 *
-	 * @return Yoast_Notification The notification containing the suggested plugin.
-	 */
-	private function get_yoast_seo_suggested_plugins_notification( $name, $plugin, $dependency_name ) {
-		$info_message = sprintf(
-			/* translators: %1$s expands to Yoast SEO, %2$s expands to the plugin version, %3$s expands to the plugin name */
-			__( '%1$s and %2$s can work together a lot better by adding a helper plugin. Please install %3$s to make your life better.', 'wordpress-seo' ),
-			'Yoast SEO',
-			$dependency_name,
-			sprintf( '<a href="%s">%s</a>', $plugin['url'], $plugin['title'] )
-		);
-
-		return new Yoast_Notification(
-			$info_message,
-			[
-				'id'   => 'wpseo-suggested-plugin-' . $name,
-				'type' => Yoast_Notification::WARNING,
-			]
-		);
-	}
-
-	/**
 	 * Creates an unsupported PHP version notification in the notification center.
 	 *
 	 * @return void
@@ -143,7 +77,7 @@ class WPSEO_Admin_Init {
 	/**
 	 * Gets the latest released major WordPress version from the WordPress stable-check api.
 	 *
-	 * @return float The latest released major WordPress version. 0 The stable-check api doesn't respond.
+	 * @return float|int The latest released major WordPress version. 0 when the stable-check API doesn't respond.
 	 */
 	private function get_latest_major_wordpress_version() {
 		$core_updates = get_core_updates( [ 'dismissed' => true ] );
@@ -230,10 +164,13 @@ class WPSEO_Admin_Init {
 			// For backwards compatabilty, this still needs a global, for now...
 			$GLOBALS['wpseo_admin_pages'] = new WPSEO_Admin_Pages();
 
+			$page = filter_input( INPUT_GET, 'page' );
 			// Only register the yoast i18n when the page is a Yoast SEO page.
-			if ( WPSEO_Utils::is_yoast_seo_free_page( filter_input( INPUT_GET, 'page' ) ) ) {
+			if ( WPSEO_Utils::is_yoast_seo_free_page( $page ) ) {
 				$this->register_i18n_promo_class();
-				$this->register_premium_upsell_admin_block();
+				if ( $page !== 'wpseo_titles' ) {
+					$this->register_premium_upsell_admin_block();
+				}
 			}
 		}
 	}
@@ -252,7 +189,7 @@ class WPSEO_Admin_Init {
 	 * @return void
 	 */
 	private function register_premium_upsell_admin_block() {
-		if ( ! WPSEO_Utils::is_yoast_seo_premium() ) {
+		if ( ! YoastSEO()->helpers->product->is_premium() ) {
 			$upsell_block = new WPSEO_Premium_Upsell_Admin_Block( 'wpseo_admin_promo_footer' );
 			$upsell_block->register_hooks();
 		}
@@ -333,25 +270,33 @@ class WPSEO_Admin_Init {
 				'version'     => '9.4',
 				'alternative' => null,
 			],
-			'wpseo_opengraph'                       => [
+			'wpseo_opengraph' => [
 				'version'     => '14.0',
 				'alternative' => null,
 			],
-			'wpseo_twitter'                         => [
+			'wpseo_twitter' => [
 				'version'     => '14.0',
 				'alternative' => null,
 			],
-			'wpseo_twitter_taxonomy_image'          => [
+			'wpseo_twitter_taxonomy_image' => [
 				'version'     => '14.0',
 				'alternative' => null,
 			],
-			'wpseo_twitter_metatag_key'             => [
+			'wpseo_twitter_metatag_key' => [
 				'version'     => '14.0',
 				'alternative' => null,
 			],
-			'wp_seo_get_bc_ancestors'               => [
+			'wp_seo_get_bc_ancestors' => [
 				'version'     => '14.0',
 				'alternative' => 'wpseo_breadcrumb_links',
+			],
+			'validate_facebook_app_id_api_response_code' => [
+				'version'     => '15.5',
+				'alternative' => null,
+			],
+			'validate_facebook_app_id_api_response_body' => [
+				'version'     => '15.5',
+				'alternative' => null,
 			],
 		];
 
@@ -364,13 +309,13 @@ class WPSEO_Admin_Init {
 		// Show notice for each deprecated filter or action that has been registered.
 		foreach ( $deprecated_notices as $deprecated_filter ) {
 			$deprecation_info = $deprecated_filters[ $deprecated_filter ];
-			// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped -- only uses the hardcoded values from above.
+			// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped -- Only uses the hardcoded values from above.
 			_deprecated_hook(
 				$deprecated_filter,
 				'WPSEO ' . $deprecation_info['version'],
 				$deprecation_info['alternative']
 			);
-			// phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped.
+			// phpcs:enable
 		}
 	}
 
@@ -453,65 +398,28 @@ class WPSEO_Admin_Init {
 		);
 	}
 
-	/* ********************* DEPRECATED METHODS ********************* */
-
 	/**
-	 * Add an alert if outdated versions of Yoast SEO plugins are running.
+	 * Adds a custom Yoast section within the Classic Editor publish box.
 	 *
-	 * @deprecated 12.3
-	 * @codeCoverageIgnore
-	 */
-	public function yoast_plugin_compatibility_notification() {
-		_deprecated_function( __METHOD__, 'WPSEO 12.3' );
-	}
-
-	/**
-	 * Creates a WordPress upgrade notification in the notification center.
-	 *
-	 * @deprecated 12.5
-	 * @codeCoverageIgnore
+	 * @param \WP_Post $post The current post object.
 	 *
 	 * @return void
 	 */
-	public function wordpress_upgrade_notice() {
-		_deprecated_function( __METHOD__, 'WPSEO 12.5' );
+	public function add_publish_box_section( $post ) {
+		if ( in_array( $this->pagenow, [ 'post.php', 'post-new.php' ], true ) ) {
+			?>
+			<div id="yoast-seo-publishbox-section"></div>
+			<?php
+			/**
+			 * Fires after the post time/date setting in the Publish meta box.
+			 *
+			 * @api \WP_Post The current post object.
+			 */
+			do_action( 'wpseo_publishbox_misc_actions', $post );
+		}
 	}
 
-	/**
-	 * Shows a notice to the user if they have Google Analytics for WordPress 5.4.3 installed because it causes an error
-	 * on the google search console page.
-	 *
-	 * @deprecated 12.5
-	 *
-	 * @codeCoverageIgnore
-	 */
-	public function ga_compatibility_notice() {
-		_deprecated_function( __METHOD__, 'WPSEO 12.5' );
-	}
-
-	/**
-	 * Display notice to disable comment pagination.
-	 *
-	 * @deprecated 12.8
-	 * @codeCoverageIgnore
-	 */
-	public function page_comments_notice() {
-		_deprecated_function( __METHOD__, 'WPSEO 12.8' );
-	}
-
-	/**
-	 * Are page comments enabled.
-	 *
-	 * @deprecated 12.8
-	 * @codeCoverageIgnore
-	 *
-	 * @return bool
-	 */
-	public function has_page_comments() {
-		_deprecated_function( __METHOD__, 'WPSEO 12.8' );
-
-		return get_option( 'page_comments' ) === '1';
-	}
+	/* ********************* DEPRECATED METHODS ********************* */
 
 	/**
 	 * Notify about the default tagline if the user hasn't changed it.
@@ -537,8 +445,7 @@ class WPSEO_Admin_Init {
 		$blog_description         = get_bloginfo( 'description' );
 		$default_blog_description = 'Just another WordPress site';
 
-		// We are checking against the WordPress internal translation.
-		// @codingStandardsIgnoreLine
+		// We are using the WordPress internal translation.
 		$translated_blog_description = __( 'Just another WordPress site', 'default' );
 
 		return $translated_blog_description === $blog_description || $default_blog_description === $blog_description;

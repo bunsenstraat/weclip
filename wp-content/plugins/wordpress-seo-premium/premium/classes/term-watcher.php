@@ -177,24 +177,28 @@ class WPSEO_Term_Watcher extends WPSEO_Watcher implements WPSEO_WordPress_Integr
 	 * @param int $term_id The term id that will be deleted.
 	 */
 	public function detect_term_delete( $term_id ) {
-		// When term is a menu don't show the redirect creation notice.
-		if ( is_nav_menu( $term_id ) ) {
+		$term = \get_term( $term_id );
+
+		if ( ! $term || is_wp_error( $term ) ) {
 			return;
 		}
 
-		global $wpdb;
-
-		// Get the term and taxonomy from the term_taxonomy table.
-		$term_row = $wpdb->get_row( $wpdb->prepare( 'SELECT `term_id`, `taxonomy` FROM `' . $wpdb->term_taxonomy . '` WHERE `term_taxonomy_id` = %d ', $term_id ) );
-
-		// Check result.
-		if ( $term_row !== null ) {
-
-			// Get the URL.
-			$url = $this->get_target_url( get_term( $term_row->term_id, $term_row->taxonomy ), $term_row->taxonomy );
+		if ( $this->is_redirect_needed( $term ) ) {
+			$url = $this->get_target_url( $term, $term->taxonomy );
 
 			$this->set_delete_notification( $url );
 		}
+	}
+
+	/**
+	 * Checks if a redirect is needed for the term with the given ID.
+	 *
+	 * @param WP_Term $term The term to check.
+	 *
+	 * @return bool If a redirect is needed.
+	 */
+	protected function is_redirect_needed( $term ) {
+		return ! \is_nav_menu( $term->term_id ) && \is_taxonomy_viewable( $term->taxonomy );
 	}
 
 	/**
@@ -275,9 +279,9 @@ class WPSEO_Term_Watcher extends WPSEO_Watcher implements WPSEO_WordPress_Integr
 	 * @return string
 	 */
 	protected function get_delete_notification() {
-		/* translators: %1$s: Yoast SEO Premium, %2$s: List with actions, %3$s: <a href='{post_with_explaination.}'>, %4$s: </a> */
+		/* translators: %1$s: Yoast SEO Premium, %2$s: List with actions, %3$s: <a href='{post_with_explaination.}'>, %4$s: </a>, %5%s: The removed url. */
 		return __(
-			'%1$s detected that you deleted a term. You can either: %2$s Don\'t know what to do? %3$sRead this post %4$s.',
+			'%1$s detected that you deleted a term (%5$s). You can either: %2$s Don\'t know what to do? %3$sRead this post %4$s.',
 			'wordpress-seo-premium'
 		);
 	}
@@ -310,7 +314,7 @@ class WPSEO_Term_Watcher extends WPSEO_Watcher implements WPSEO_WordPress_Integr
 	 * @return bool True when in an AJAX-request and the action is inline-save.
 	 */
 	protected function is_action_inline_save_tax() {
-		return ( defined( 'DOING_AJAX' ) && DOING_AJAX && filter_input( INPUT_POST, 'action' ) === 'inline-save-tax' );
+		return ( wp_doing_ajax() && filter_input( INPUT_POST, 'action' ) === 'inline-save-tax' );
 	}
 
 	/**
@@ -319,6 +323,6 @@ class WPSEO_Term_Watcher extends WPSEO_Watcher implements WPSEO_WordPress_Integr
 	 * @return bool True when in an AJAX-request and the action is delete-tag.
 	 */
 	protected function is_action_delete_tag() {
-		return ( defined( 'DOING_AJAX' ) && DOING_AJAX && filter_input( INPUT_POST, 'action' ) === 'delete-tag' );
+		return ( wp_doing_ajax() && filter_input( INPUT_POST, 'action' ) === 'delete-tag' );
 	}
 }

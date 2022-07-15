@@ -28,8 +28,6 @@ class PostmanLicenseManager {
     {
         $this->includes();
         $this->rand_cache_interval = rand( 1, 24 );
-
-        add_filter( 'extra_plugin_headers', [ $this, 'add_extension_headers' ] );
     }
 
     public function includes() {
@@ -37,14 +35,6 @@ class PostmanLicenseManager {
 
         include_once ABSPATH . '/wp-admin/includes/plugin.php';
 
-    }
-
-
-    function add_extension_headers($headers) {
-        $headers[] = 'Class';
-        $headers[] = 'Slug';
-
-        return $headers;
     }
 
     /**
@@ -68,11 +58,9 @@ class PostmanLicenseManager {
                 $this->extensions[$slug]['plugin_dir_and_filename'] = $plugin_dir_and_filename;
                 $this->extensions[$slug]['license_manager'] = new PostmanLicenseHandler(
                     $plugin_path, $plugin_data['Name'],
-                    $plugin_data['Version'], $plugin_data['Author']
+                    $plugin_data['Version'], $plugin_data['Author'], null, self::ENDPOINT
                 );
                 if ( $this->extensions[$slug]['license_manager']->is_licensed() ) {
-                    include_once $plugin_path;
-
                     $this->extensions[$slug]['instance'] = new $class;
                 }
             }

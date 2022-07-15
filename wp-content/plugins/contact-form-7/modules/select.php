@@ -40,7 +40,14 @@ function wpcf7_select_form_tag_handler( $tag ) {
 		$atts['aria-required'] = 'true';
 	}
 
-	$atts['aria-invalid'] = $validation_error ? 'true' : 'false';
+	if ( $validation_error ) {
+		$atts['aria-invalid'] = 'true';
+		$atts['aria-describedby'] = wpcf7_get_validation_error_reference(
+			$tag->name
+		);
+	} else {
+		$atts['aria-invalid'] = 'false';
+	}
 
 	$multiple = $tag->has_option( 'multiple' );
 	$include_blank = $tag->has_option( 'include_blank' );
@@ -68,7 +75,6 @@ function wpcf7_select_form_tag_handler( $tag ) {
 
 	$default_choice = $tag->get_default_option( null, array(
 		'multiple' => $multiple,
-		'shifted' => $include_blank,
 	) );
 
 	if ( $include_blank
@@ -98,8 +104,11 @@ function wpcf7_select_form_tag_handler( $tag ) {
 
 		$label = isset( $labels[$key] ) ? $labels[$key] : $value;
 
-		$html .= sprintf( '<option %1$s>%2$s</option>',
-			$item_atts, esc_html( $label ) );
+		$html .= sprintf(
+			'<option %1$s>%2$s</option>',
+			$item_atts,
+			esc_html( $label )
+		);
 	}
 
 	if ( $multiple ) {
@@ -108,41 +117,37 @@ function wpcf7_select_form_tag_handler( $tag ) {
 
 	$atts['name'] = $tag->name . ( $multiple ? '[]' : '' );
 
-	$atts = wpcf7_format_atts( $atts );
-
 	$html = sprintf(
-		'<span class="wpcf7-form-control-wrap %1$s"><select %2$s>%3$s</select>%4$s</span>',
-		sanitize_html_class( $tag->name ), $atts, $html, $validation_error
+		'<span class="wpcf7-form-control-wrap" data-name="%1$s"><select %2$s>%3$s</select>%4$s</span>',
+		esc_attr( $tag->name ),
+		wpcf7_format_atts( $atts ),
+		$html,
+		$validation_error
 	);
 
 	return $html;
 }
 
 
-/* Validation filter */
+add_action(
+	'wpcf7_swv_create_schema',
+	'wpcf7_swv_add_select_rules',
+	10, 2
+);
 
-add_filter( 'wpcf7_validate_select', 'wpcf7_select_validation_filter', 10, 2 );
-add_filter( 'wpcf7_validate_select*', 'wpcf7_select_validation_filter', 10, 2 );
+function wpcf7_swv_add_select_rules( $schema, $contact_form ) {
+	$tags = $contact_form->scan_form_tags( array(
+		'type' => array( 'select*' ),
+	) );
 
-function wpcf7_select_validation_filter( $result, $tag ) {
-	$name = $tag->name;
-
-	if ( isset( $_POST[$name] )
-	and is_array( $_POST[$name] ) ) {
-		foreach ( $_POST[$name] as $key => $value ) {
-			if ( '' === $value ) {
-				unset( $_POST[$name][$key] );
-			}
-		}
+	foreach ( $tags as $tag ) {
+		$schema->add_rule(
+			wpcf7_swv_create_rule( 'required', array(
+				'field' => $tag->name,
+				'error' => wpcf7_get_message( 'invalid_required' ),
+			) )
+		);
 	}
-
-	$empty = ! isset( $_POST[$name] ) || empty( $_POST[$name] ) && '0' !== $_POST[$name];
-
-	if ( $tag->is_required() and $empty ) {
-		$result->invalidate( $tag, wpcf7_get_message( 'invalid_required' ) );
-	}
-
-	return $result;
 }
 
 
