@@ -530,186 +530,19 @@ a.bestelButton:hover::after { right:10px;}
     text-transform: uppercase;
 }
 
-/** CF STYLE **/
-/*
-.material-icons.prefix { font-family: 'Material Icons';font-size: 24px; }
-.wpcf7-form input[type=number],
-.wpcf7-form input[type=text],
-.wpcf7-form input[type=email],
-.wpcf7-form textarea{
-	margin-left: 3rem;
-    width: 92%;
-    width: calc(100% - 3rem);
-	border:none;
-	border-bottom: 1px solid #9e9e9e;
-}
-.wpcf7-form-control-wrap {}
-.smallColumn {width: 94%;margin: auto; clear:both;Max-width:680px}
-*/
-/*
-::-webkit-input-placeholder {color:#fff; }
-:-moz-placeholder { color:#fff; }
-::-moz-placeholder { color:#fff;}
-:-ms-input-placeholder {color:#fff; }
-input, textarea {-webkit-appearance: none; border-radius:0;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;}
-input[type=text],
-input[type=email],
-input[type=password] {
-	color:#fff;
-	font-size:1em; 
-	font-family:"proxima-nova",sans-serif; 
-	font-weight:500; 
-	border:0;
-	line-height:36px;
-	background: #50b1d6;
-}
-textarea {
-	padding-left: 3px;
-	font-family:"proxima-nova",sans-serif; 
-	font-weight:500; 
-	width: 99%;
-}
-input[type=text] {
-}
+/* forminator-ui */
 
-#mc_embed_signup .formwrap div.mce_inline_error {padding: 5px;z-index: 1; background:#da3e01;color: #fff;left: 0;top: 36px; font-size:.9em; font-weight:normal}
-#mce-success-response {clear: both;color: #a3c523; padding-top:10px}
-.formwrap {min-height:60px}
-.formwrap .mc-field-group, .formwrap .mc-button { float:left; width:32%;margin-left:2%; position:relative;}
-.formwrap .mc-field-group:first-child {margin-left:0}
-.formwrap .mc-field-group input { width:100%; padding-left:4%; padding-right:4%; line-height:36px;}
-.formwrap .mc-button input { width:100%; padding-left:4%; padding-right:4%; line-height:34px; padding:0}
-.formwrap:first-child {margin-left:0 !important}
-
-
-.button, a.button, a.more-link, .submit {
-	background-color: #fff;
-	color: #50b1d6;
-	cursor: pointer;
-	display: inline-block;
-	line-height: 1;
-	padding:5px;
-	position: relative;
-	text-decoration: none;
-	font-size: 1em;
-	border:0;
-	text-transform:uppercase;
-	border: 2px solid #50b1d6;
-	-webkit-transition: all .3s linear;
-	transition: all .3s linear;
-}
-.button:hover, a.button:hover, a.more-link:hover, .submit:hover, a.submit:hover {
-	background-color: #50b1d6;
-	text-decoration:none;
-	color:#fff;
-}
-
-input#s {
-	font-size: 14px;
-	height: 22px;
-	line-height: 1.2em;
-	padding: 9px 45px 9px 15px;
-}
-form#searchform {position:relative}
-input#searchsubmit {background: url(gfx/sprite.png) no-repeat 0 -296px; height:30px; width:30px; display:block; border:0; position:absolute; right:8px;top:8px}
-
-
-.extra_content2 .second_part h1, .extra_form .second_part2 h1 {
+.forminator-ui#forminator-module-2461.forminator-design--material h2.forminator-title { 
+	margin-bottom: 40px;
+    margin-top: 40px;
     color: #EB4819;
-    font-family:"museo-sans-n9", "museo-sans", arial;
-    font-size: 15px;
-    font-weight: 900;
-    text-align: center;
-}
-.extra_content2 .second_part p {
-    color: #fff;
-    font-family:"museo-sans-n5", "museo-sans", arial;
-    font-weight: 500;
-    line-height: 19px;
-    margin: 0 auto;
-    text-align: center;
-    width: 645px;
-    padding-top: 15px;
-}
-.extra_form {
-    height: 960px;
-}
-.extra_form .second_part2 {
-    margin: 0 auto;
-    padding-top: 90px;
-    width: 960px;
-}
-.extra_form .second_part2 p {
-    color: #1E293B;
-    font-family:"museo-sans-n5", "museo-sans", arial;
-    font-weight: 500;
-    line-height: 19px;
-    margin: 0 auto;
-    text-align: center;
-    width: 615px;
-    padding-top: 15px;
-}
-.extra_form .second_part3 {
-    margin: 0 auto;
-    padding-top : 45px;
-    width: 750px;
-}
-.extra_form .second_part3 form .field {
-   line-height: 30px;
-   vertical-align: middle;
-   width: 100%; 
-   margin-bottom: 20px;
-}
-.extra_form .second_part3 form .field h4 {
-      float: left;
-}
-#extra_form .field input[type="text"]{
-background-image: url("images/text_extra.png");
-    background-repeat: no-repeat;
-    color: #1E293B;
-    float: right;
-    font-family:"museo-sans-n5", "museo-sans", arial;
-    width: 434px;
-    border-radius: 0 0 0 0;
-}
-.extra_form .second_part3 form .field ul li {
-    float: left;
-    width: 50%;
-     line-height: 40px;
-}
-.extra_form .second_part3 form .field ul {
-    float: right;
-    width: 447px;
-}
-.extra_form .second_part3 form .field ul span { 
-	margin-left : 10px;
-	font-weight: bold;
-}
-.extra_form .second_part3 form .field ul input[type="checkbox"] {
-	vertical-align: middle;
-}
-.field .files{
-    background-image: url("images/text_extra.png");
-    border-radius: 0 0 0 0;
-    color: #1E293B;
-    float: right;
-    font-size: 13px;
-    font-weight: bold;
-    height: 33px;
-    margin-left: 20px;
-    margin-right: 0;
-    width: 153px;
-}
-#extra_form .field textarea {
-    float: right;
-    width: 435px;
-    border-radius: 0 0 0 0;
-}
-.prices_content {
-    height: 1860px;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 1.6em;
+	text-align: center;
 }
 
-*/
+
 
 
 /*!

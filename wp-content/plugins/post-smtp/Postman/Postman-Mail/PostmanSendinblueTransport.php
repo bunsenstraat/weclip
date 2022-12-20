@@ -16,7 +16,7 @@ class PostmanSendinblueTransport extends PostmanAbstractModuleTransport implemen
     const SLUG = 'sendinblue_api';
     const PORT = 587;
     const HOST = 'smtp-relay.sendinblue.com';
-    const PRIORITY = 8000;
+    const PRIORITY = 50000;
     const SENDINBLUE_AUTH_OPTIONS = 'postman_sendinblue_auth_options';
     const SENDINBLUE_AUTH_SECTION = 'postman_sendinblue_auth_section';
 
@@ -271,6 +271,51 @@ class PostmanSendinblueTransport extends PostmanAbstractModuleTransport implemen
 
         return POST_SMTP_ASSETS . "images/logos/sendinblue.png";
 
+	}
+
+    /**
+	 * Returns true, to prevent from errors because it's default Module Transport.
+	 * 
+	 * @since 2.1.8
+	 * @version 1.0
+	 */
+	public function has_granted() {
+
+		return true;
+
+	}
+
+    /**
+	 * (non-PHPdoc)
+	 *
+	 * @see PostmanTransport::getMisconfigurationMessage()
+     * @since 2.1.8
+     * @version 1.0
+	 */
+	protected function validateTransportConfiguration() {
+		$messages = parent::validateTransportConfiguration ();
+		$apiKey = $this->options->getSendinblueApiKey ();
+		if (empty ( $apiKey )) {
+			array_push ( $messages, __ ( 'API Key can not be empty', 'post-smtp' ) . '.' );
+			$this->setNotConfiguredAndReady ();
+		}
+		if (! $this->isSenderConfigured ()) {
+			array_push ( $messages, __ ( 'Message From Address can not be empty', 'post-smtp' ) . '.' );
+			$this->setNotConfiguredAndReady ();
+		}
+		return $messages;
+	}
+
+    /**
+	 *
+	 * @param mixed $data     
+     * @since 2.1.8
+     * @version 1.0   	
+	 */
+	public function prepareOptionsForExport($data) {
+		$data = parent::prepareOptionsForExport ( $data );
+		$data [PostmanOptions::SENDINBLUE_API_KEY] = PostmanOptions::getInstance ()->getSendinblueApiKey ();
+		return $data;
 	}
 }
 endif;

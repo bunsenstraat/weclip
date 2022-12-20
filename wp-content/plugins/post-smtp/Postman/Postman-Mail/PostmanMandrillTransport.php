@@ -14,7 +14,7 @@ class PostmanMandrillTransport extends PostmanAbstractModuleTransport implements
 	const SLUG = 'mandrill_api';
 	const PORT = 443;
 	const HOST = 'mandrillapp.com';
-	const PRIORITY = 9000;
+	const PRIORITY = 46000;
 	const MANDRILL_AUTH_OPTIONS = 'postman_mandrill_auth_options';
 	const MANDRILL_AUTH_SECTION = 'postman_mandrill_auth_section';
 	public function __construct($rootPluginFilenameAndPath) {
@@ -289,6 +289,18 @@ class PostmanMandrillTransport extends PostmanAbstractModuleTransport implements
 	public function getLogoURL() {
 
 		return POST_SMTP_ASSETS . "images/logos/mandrill.png";
+
+	}
+
+	/**
+	 * Returns true, to prevent from errors because it's default Module Transport.
+	 * 
+	 * @since 2.1.8
+	 * @version 1.0
+	 */
+	public function has_granted() {
+
+		return true;
 
 	}
 }

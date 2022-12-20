@@ -14,7 +14,7 @@ class PostmanSendGridTransport extends PostmanAbstractModuleTransport implements
 	const SLUG = 'sendgrid_api';
 	const PORT = 443;
 	const HOST = 'api.sendgrid.com';
-	const PRIORITY = 8000;
+	const PRIORITY = 48000;
 	const SENDGRID_AUTH_OPTIONS = 'postman_sendgrid_auth_options';
 	const SENDGRID_AUTH_SECTION = 'postman_sendgrid_auth_section';
 	
@@ -240,6 +240,19 @@ class PostmanSendGridTransport extends PostmanAbstractModuleTransport implements
 	public function getLogoURL() {
 
 		return POST_SMTP_ASSETS . "images/logos/sendgrid.png";
+
+	}
+
+
+	/**
+	 * Returns true, to prevent from errors because it's default Module Transport.
+	 * 
+	 * @since 2.1.8
+	 * @version 1.0
+	 */
+	public function has_granted() {
+
+		return true;
 
 	}
 }

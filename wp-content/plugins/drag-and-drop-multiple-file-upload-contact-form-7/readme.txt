@@ -4,7 +4,7 @@ Donate link : http://codedropz.com/donation
 Tags: drag and drop, contact form 7, ajax uploader, multiple file, upload, contact form 7 uploader
 Requires at least: 3.0.1
 Tested up to: 6.0
-Stable tag: 1.3.6.4
+Stable tag: 1.3.6.5
 Requires PHP: 5.2.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -156,6 +156,10 @@ To install this plugin see below:
 6. Multiple Drag and Drop Fields - Front
 
 == Changelog ==
+
+= 1.3.6.5 =
+- Fixed - security issue ("Unauthenticated File upload Size limit bypass") thanks to Sanjay Das from "Payatu Security Consulting "
+- Added fixes so it should get the size limit on the cf7/admin settings instead of the post request.
 
 = 1.3.6.4 =
 - Tested on latest version of wordpress 6.0.

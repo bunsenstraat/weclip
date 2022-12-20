@@ -17,6 +17,7 @@ class PostmanGmailApiModuleTransport extends PostmanAbstractZendModuleTransport 
 	const PORT = 443;
 	const HOST = 'www.googleapis.com';
 	const ENCRYPTION_TYPE = 'ssl';
+	const PRIORITY = 49000;
 	public function __construct($rootPluginFilenameAndPath) {
 		parent::__construct ( $rootPluginFilenameAndPath );
 		
@@ -209,7 +210,7 @@ class PostmanGmailApiModuleTransport extends PostmanAbstractZendModuleTransport 
 		if ($hostData->hostname == self::HOST && $hostData->port == self::PORT) {
 			/* translators: where variables are (1) transport name (2) host and (3) port */
 			$recommendation ['message'] = sprintf ( __ ( ('Postman recommends the %1$s to host %2$s on port %3$d.') ), $this->getName (), self::HOST, self::PORT );
-			$recommendation ['priority'] = 27000;
+			$recommendation ['priority'] = self::PRIORITY;
 		}
 		
 		return $recommendation;
@@ -270,6 +271,38 @@ class PostmanGmailApiModuleTransport extends PostmanAbstractZendModuleTransport 
 	public function getLogoURL() {
 
 		return POST_SMTP_ASSETS . "images/logos/gmail.png";
+
+	}
+
+	/**
+	 * Checks is granted or not
+	 * 
+	 * @since 2.1.4
+	 * @version 1.0
+	 */
+	public function has_granted() {
+
+		if( $this->isPermissionNeeded() ) {
+			return false;
+		}
+
+		return true;
+
+	}
+
+	/**
+	 * Returns the HTML of not granted
+	 * 
+	 * @since 2.1.4
+	 * @version 1.0
+	 */
+	public function get_not_granted_notice() {
+
+		return array(
+			'message'	=> __( ' You are just a step away to get started', 'post-smtp' ),
+			'url_text'	=> $this->getScribe()->getRequestPermissionLinkText(),
+			'url'		=> PostmanUtils::getGrantOAuthPermissionUrl() 
+		);
 
 	}
 }

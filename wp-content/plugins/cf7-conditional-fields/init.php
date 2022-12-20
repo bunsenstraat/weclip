@@ -1,8 +1,8 @@
 <?php
 
-if (!defined('WPCF7CF_VERSION')) define( 'WPCF7CF_VERSION', '2.2' );
-if (!defined('WPCF7CF_CF7_MIN_VERSION')) define( 'WPCF7CF_CF7_MIN_VERSION', '5.4' );
-if (!defined('WPCF7CF_CF7_MAX_VERSION')) define( 'WPCF7CF_CF7_MAX_VERSION', '5.6' );
+if (!defined('WPCF7CF_VERSION')) define( 'WPCF7CF_VERSION', '2.3.1' );
+if (!defined('WPCF7CF_CF7_MIN_VERSION')) define( 'WPCF7CF_CF7_MIN_VERSION', '5.6' );
+if (!defined('WPCF7CF_CF7_MAX_VERSION')) define( 'WPCF7CF_CF7_MAX_VERSION', '5.7.1' );
 if (!defined('WPCF7CF_REQUIRED_WP_VERSION')) define( 'WPCF7CF_REQUIRED_WP_VERSION', '4.1' );
 if (!defined('WPCF7CF_PLUGIN')) define( 'WPCF7CF_PLUGIN', __FILE__ );
 if (!defined('WPCF7CF_PLUGIN_BASENAME')) define( 'WPCF7CF_PLUGIN_BASENAME', plugin_basename( WPCF7CF_PLUGIN ) );
@@ -13,6 +13,8 @@ if (!defined('WPCF7CF_LOAD_JS')) define('WPCF7CF_LOAD_JS', true);
 if (!defined('WPCF7CF_LOAD_CSS')) define('WPCF7CF_LOAD_CSS', true);
 
 if (!defined('WPCF7CF_REGEX_MAIL_GROUP')) define( 'WPCF7CF_REGEX_MAIL_GROUP', '@\[[\s]*([a-zA-Z_][0-9a-zA-Z:._-]*)[\s]*\](.*?)\[[\s]*/[\s]*\1[\s]*\]@s');
+if (!defined('WPCF7CF_REGEX_MAIL_GROUP_INVERTED')) define( 'WPCF7CF_REGEX_MAIL_GROUP_INVERTED', '@\[![\s]*([a-zA-Z_][0-9a-zA-Z:._-]*)[\s]*\](.*?)\[![\s]*/[\s]*\1[\s]*\]@s');
+if (!defined('WPCF7CF_REGEX_MAIL_UNWANTED_WHITESPACE')) define('WPCF7CF_REGEX_MAIL_UNWANTED_WHITESPACE', '@(\[/[^\]]*\])\s+?(\[)@s');
 if (!defined('WPCF7CF_REGEX_CONDITIONS')) define( 'WPCF7CF_REGEX_CONDITIONS', '/(?:show \[([^\]]*?)\]|and) if \[([^\]]*?)\] (?:(equals \(regex\)|not equals \(regex\)|equals|not equals|greater than or equals|greater than|less than or equals|less than|is empty|not empty|function)(?: \"(.*)\")?)/m');
 
 if (!defined('WPCF7CF_MAX_RECOMMENDED_CONDITIONS')) define( 'WPCF7CF_MAX_RECOMMENDED_CONDITIONS', 50 );

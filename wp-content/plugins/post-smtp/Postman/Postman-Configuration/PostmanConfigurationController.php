@@ -263,6 +263,12 @@ class PostmanConfigurationController {
         print '<div id="sendinblue_settings" class="authentication_setting non-basic non-oauth2">';
         do_settings_sections( PostmanSendinblueTransport::SENDINBLUE_AUTH_OPTIONS );
         print '</div>';
+        print '<div id="postmark_settings" class="authentication_setting non-basic non-oauth2">';
+        do_settings_sections( PostmanPostmarkTransport::POSTMARK_AUTH_OPTIONS );
+		print '</div>';
+		print '<div id="sparkpost_settings" class="authentication_setting non-basic non-oauth2">';
+        do_settings_sections( PostmanSparkPostTransport::SPARKPOST_AUTH_OPTIONS );
+        print '</div>';
 
 		do_action( 'post_smtp_settings_sections' );
 
@@ -712,6 +718,15 @@ class PostmanGetHostnameByEmailAjaxController extends PostmanAbstractAjaxHandler
 
 	    check_admin_referer('post-smtp', 'security');
 
+		if( !current_user_can( Postman::MANAGE_POSTMAN_CAPABILITY_NAME ) ) {
+			wp_send_json_error( 
+				array(
+					'Message'	=>	'Unauthorized.'
+				), 
+				401
+			);
+		}
+
 		$goDaddyHostDetected = $this->getBooleanRequestParameter( 'go_daddy' );
 		$email = $this->getRequestParameter( 'email' );
 		$d = new PostmanSmtpDiscovery( $email );
@@ -748,6 +763,15 @@ class PostmanManageConfigurationAjaxHandler extends PostmanAbstractAjaxHandler {
 	function getManualConfigurationViaAjax() {
 
 	    check_admin_referer('post-smtp', 'security');
+		
+		if( !current_user_can( Postman::MANAGE_POSTMAN_CAPABILITY_NAME ) ) {
+			wp_send_json_error( 
+				array(
+					'Message'	=>	'Unauthorized.'
+				), 
+				401
+			);
+		}
 
 		$queryTransportType = $this->getTransportTypeFromRequest();
 		$queryAuthType = $this->getAuthenticationTypeFromRequest();
@@ -781,6 +805,15 @@ class PostmanManageConfigurationAjaxHandler extends PostmanAbstractAjaxHandler {
 	function getWizardConfigurationViaAjax() {
 
 	    check_admin_referer('post-smtp', 'security');
+
+		if( !current_user_can( Postman::MANAGE_POSTMAN_CAPABILITY_NAME ) ) {
+			wp_send_json_error( 
+				array(
+					'Message'	=>	'Unauthorized.'
+				), 
+				401
+			);
+		}
 
 		$this->logger->debug( 'in getWizardConfiguration' );
 		$originalSmtpServer = $this->getRequestParameter( 'original_smtp_server' );
@@ -863,7 +896,7 @@ class PostmanManageConfigurationAjaxHandler extends PostmanAbstractAjaxHandler {
 			$winningRecommendation = $this->getWin( $socket, $userSocketOverride, $userAuthOverride, $originalSmtpServer );
 			$this->logger->error( $socket->label );
 		}
-		
+
 		return $winningRecommendation;
 	}
 
@@ -896,7 +929,7 @@ class PostmanManageConfigurationAjaxHandler extends PostmanAbstractAjaxHandler {
 			}
 			$socket->label = $recommendation ['label'];
 		}
-		
+
 		return $winningRecommendation;
 	}
 
@@ -906,22 +939,51 @@ class PostmanManageConfigurationAjaxHandler extends PostmanAbstractAjaxHandler {
 	 * @return multitype:
 	 */
 	private function createOverrideMenus( $sockets, $winningRecommendation, $userSocketOverride, $userAuthOverride ) {
+		
 		$overrideMenu = array();
+		$last_items = array();
+
 		foreach ( $sockets as $socket ) {
+
 			$overrideItem = $this->createOverrideMenu( $socket, $winningRecommendation, $userSocketOverride, $userAuthOverride );
 			if ( $overrideItem != null ) {
-				$overrideMenu [ $socket->id ] = $overrideItem;
+				
+				$transport = PostmanTransportRegistry::getInstance()->getTransport( $socket->transport );
+
+				//If class has constant
+				if( defined( get_class( $transport ) . "::PRIORITY" ) ) {
+
+					$priority = $transport::PRIORITY;
+					$overrideMenu[$priority] = $overrideItem;
+
+				}
+				else {
+
+					$last_items[] = $overrideItem;
+
+				}
+
 			}
+
 		}
 
-		// sort
+		//Sort in DESC order
 		krsort( $overrideMenu );
-		$sortedMenu = array();
-		foreach ( $overrideMenu as $menu ) {
-			array_push( $sortedMenu, $menu );
-		}
+		
+		//Start Placing sockets in last, because they don't have there own priority.
+		foreach( $last_items as $item ) {
 
-		return $sortedMenu;
+			$overrideMenu[] = $item;
+
+		}
+		
+		$menu = array();
+		foreach ( $overrideMenu as $key ) {
+			array_push( $menu, $key );
+		}
+		
+		return $menu;
+		
 	}
 
 	/**
@@ -997,6 +1059,15 @@ class PostmanImportConfigurationAjaxController extends PostmanAbstractAjaxHandle
 	function getConfigurationFromExternalPluginViaAjax() {
 
         check_admin_referer('post-smtp', 'security');
+
+		if( !current_user_can( Postman::MANAGE_POSTMAN_CAPABILITY_NAME ) ) {
+			wp_send_json_error( 
+				array(
+					'Message'	=>	'Unauthorized.'
+				), 
+				401
+			);
+		}
 
 		$importableConfiguration = new PostmanImportableConfiguration();
 		$plugin = $this->getRequestParameter( 'plugin' );

@@ -518,7 +518,15 @@
         $types = explode('|', $atts['data-type'] );
 
         if( $types && ! wp_is_mobile() ) {
-            $atts['accept'] = '.' . implode(', .', array_map( 'trim', $types ) );
+            $type = implode(', .', array_map( 'trim', $types ) );
+            if( $type != '*' ) {
+                $atts['accept'] = '.' . $type;
+            }
+        }
+
+        // Allow blacklist
+        if( $tag->get_option('blacklist-types', '', true) ){
+            $atts['data-black-list'] = $tag->get_option('blacklist-types', '', true);
         }
 
 		// Combine and format attrbiutes
@@ -668,6 +676,10 @@
 							<th scope="row"><label for="<?php echo esc_attr( $args['content'] . '-filetypes' ); ?>"><?php echo esc_html( __( 'Acceptable file types', 'contact-form-7' ) ); ?></label></th>
 							<td><input type="text" name="filetypes" class="filetype oneline option" placeholder="jpeg|png|jpg|gif" id="<?php echo esc_attr( $args['content'] . '-filetypes' ); ?>" /></td>
 						</tr>
+                        <tr>
+							<th scope="row"><label for="<?php echo esc_attr( $args['content'] . '-blacklist-types' ); ?>"><?php echo esc_html( __( 'Blacklist file types', 'contact-form-7' ) ); ?></label></th>
+							<td><input type="text" name="blacklist-types" class="filetype oneline option" placeholder="exe|bat|com" id="<?php echo esc_attr( $args['content'] . '-blacklist-types' ); ?>" /></td>
+						</tr>
 						<tr>
 							<th scope="row"><label for="<?php echo esc_attr( $args['content'] . '-min-file' ); ?>"><?php echo esc_html( __( 'Minimum file upload', 'contact-form-7' ) ); ?></label></th>
 							<td><input type="text" name="min-file" class="filetype oneline option" placeholder="5" id="<?php echo esc_attr( $args['content'] . '-min-file' ); ?>" /></td>
@@ -706,7 +718,49 @@
 	// Get allowed types
 	function dnd_cf7_get_allowed_types( $form_id ) {
 
-		// Initialize contact form instance
+		$tags = dnd_get_upload_form( $form_id );
+		$supported_types = array();
+
+		// Loop all upload tags
+		if( $tags && is_array( $tags ) ) {
+			foreach( $tags as $tag ) {
+
+				// Get file types option & remove not allowed character..
+				$types = preg_replace( '/[^a-zA-Z0-9*|\']/', '', $tag->get_option('filetypes','', true ) );
+
+				// Assign if filetypes is present otherwise use the default ext list.
+				$supported_types[ $tag->name ] = ( $types ? $types : dnd_upload_default_ext() );
+			}
+		}
+
+		return $supported_types;
+	}
+
+    // Get file size option
+    function dnd_cf7_get_size_limit( $form_id ) {
+
+        $tags = dnd_get_upload_form( $form_id );
+        $allowed_size = array();
+        
+        // Loop all upload tags
+		if( $tags && is_array( $tags ) ) {
+			foreach( $tags as $tag ) {
+
+				// Get file types option & remove not allowed character..
+				$limit = $tag->get_option('limit','', true );
+
+				// Assign if filetypes is present otherwise use the default ext list.
+				$allowed_size[ $tag->name ] = ( $limit ? $limit : 10485760 ); //default 10MB
+			}
+		}
+
+        return $allowed_size;
+    }
+
+    // Get contact form data
+    function dnd_get_upload_form( $form_id ){
+        
+        // Initialize contact form instance
 		$form = WPCF7_ContactForm::get_instance( $form_id );
 
 		// Check if not valid object and null
@@ -716,22 +770,13 @@
 
 		// Get specific tag (mfile is for dnd file upload)
 		$tags = $form->scan_form_tags( array( 'type' => array('mfile', 'mfile*') ) );
-		$supported_types = array();
 
-		// Loop all upload tags
-		if( $tags && is_array( $tags ) ) {
-			foreach( $tags as $tag ) {
+        if( $tags ){
+            return $tags;
+        }
 
-				// Get file types option & remove not allowed character..
-				$types = preg_replace( '/[^a-zA-Z0-9|\']/', '', $tag->get_option('filetypes','', true ) );
-
-				// Assign if filetypes is present otherwise use the default ext list.
-				$supported_types[ $tag->name ] = ( $types ? $types : dnd_upload_default_ext() );
-			}
-		}
-
-		return $supported_types;
-	}
+        return false;
+    }
 
 	// Begin process upload
 	function dnd_upload_cf7_upload() {
@@ -745,10 +790,16 @@
 		// Get allowed ext list @expected : png|jpeg|jpg
 		$allowed_types = dnd_cf7_get_allowed_types( $cf7_id );
 
+        // File size limit
+        $size_limit = dnd_cf7_get_size_limit( $cf7_id );
+
 		// check and verify ajax request
 		if( is_user_logged_in() ) {
 			check_ajax_referer( 'dnd-cf7-security-nonce', 'security' );
 		}
+
+        // Get blacklist Types
+        $blacklist_types = ( isset( $_POST['blacklist-types'] ) ?  explode( '|', sanitize_text_field( $_POST['blacklist-types'] ) ) : '' );
 
 		// Get upload dir
 		$path = dnd_get_upload_dir();
@@ -774,13 +825,18 @@
 		// Get file extension
 		$extension = strtolower( pathinfo( $file['name'], PATHINFO_EXTENSION ) );
 
+        // Validate File Types
+        if( $blacklist_types && in_array( $extension, $blacklist_types ) && $supported_type == '*' ){
+            wp_send_json_error( get_option('drag_n_drop_error_invalid_file') ? get_option('drag_n_drop_error_invalid_file') : dnd_cf7_error_msg('invalid_type') );
+        }
+
 		// validate file type
-		if ( ! preg_match( $file_type_pattern, $file['name'] ) || ! dnd_cf7_validate_type( $extension, $supported_type ) ) {
+		if ( ( ! preg_match( $file_type_pattern, $file['name'] ) || ! dnd_cf7_validate_type( $extension, $supported_type ) ) && $supported_type != '*' ) {
 			wp_send_json_error( get_option('drag_n_drop_error_invalid_file') ? get_option('drag_n_drop_error_invalid_file') : dnd_cf7_error_msg('invalid_type') );
 		}
 
 		// validate file size limit
-		if( $file['size'] > (int)$_POST['size_limit'] ) {
+		if( isset( $size_limit["$cf7_upload_name"] ) && $file['size'] > $size_limit["$cf7_upload_name"] ) {
 			wp_send_json_error( get_option('drag_n_drop_error_files_too_large') ? get_option('drag_n_drop_error_files_too_large') : dnd_cf7_error_msg('large_file') );
 		}
 
